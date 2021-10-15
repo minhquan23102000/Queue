@@ -74,6 +74,23 @@ public class RoomEntryRequester {
 
     }
 
+    /**
+     * Method to update qr file name of a room
+     * **/
+    public void updateQrFileName(String fileName, String roomKey) {
+        DatabaseReference room = find(roomKey);
+        room.child(RoomDataEntry.ROOT_NAME).child(RoomDataEntry.QR_ARM).setValue(fileName);
+    }
+
+    /**
+     * Function to find a room, return its DatabaseReference
+     * **/
+    public DatabaseReference find(String roomKey) {
+        return mDatabase.child(RoomEntry.ROOT_NAME).child(roomKey);
+    }
+
+
+
 
     //Tạo test data, chạy một lần thôi, đừng chạy nữa nha, chạy nữa không sao nhưng nó ra hai cái. Nhờ lên firebase xem data mình tạo sẵn nha, là chạy cái  này đấy.
     public void initTestData() {

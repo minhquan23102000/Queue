@@ -13,6 +13,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private MaterialButton logoutBtn;
+    private MaterialButton createRoomBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,11 +22,20 @@ public class MainActivity extends AppCompatActivity {
 
         //Init all view in this activity
         logoutBtn = findViewById(R.id.logoutBtn);
+        createRoomBtn = findViewById(R.id.hostBtn);
 
         logoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                MainActivity.this.startActivity(intent);
+            }
+        });
+
+        createRoomBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, CreateRoomActivity.class);
                 MainActivity.this.startActivity(intent);
             }
         });

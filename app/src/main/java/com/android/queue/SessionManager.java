@@ -4,12 +4,17 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract.UserEntry;
+import com.google.android.gms.maps.model.LatLng;
 
 public class SessionManager {
     public static final String TAG = SessionManager.class.getName();
     private final SharedPreferences userSession;
     private final SharedPreferences.Editor userDataEditor;
     private final Context mContext;
+
+    static final public String HOST_ROOM_LATITUDE = "hostRoomLatitude";
+    static final public String HOST_ROOM_LONGITUDE = "hostRoomLongitude";
+    static final public String HOST_ROOM_ADDRESS = "hostRoomAddress";
 
     public SessionManager(Context context) {
         mContext = context;
@@ -28,6 +33,7 @@ public class SessionManager {
         userDataEditor.putBoolean(UserEntry.IS_HOST_ARM, isHost);
         userDataEditor.commit();
     }
+
 
     public boolean isLogin() {
         String phone = userSession.getString(UserEntry.PHONE_ARM, null);
@@ -53,8 +59,41 @@ public class SessionManager {
         userDataEditor.commit();
     }
 
+
+    public void putHostRoomLocation(LatLng latLng, String address){
+        putDouble(userDataEditor, HOST_ROOM_LATITUDE, latLng.latitude);
+        putDouble(userDataEditor, HOST_ROOM_LONGITUDE, latLng.longitude);
+        userDataEditor.putString(HOST_ROOM_ADDRESS, address);
+        userDataEditor.commit();
+    }
+
+    public String getHostRoomAddress() {
+        return userSession.getString(HOST_ROOM_ADDRESS, null);
+    }
+
+    public LatLng getHostRoomLatLng() {
+        return new LatLng(getDouble(userSession, HOST_ROOM_LATITUDE, 0),
+                getDouble(userSession, HOST_ROOM_LONGITUDE, 0));
+    }
+
+    public void clearHostRoomLocation() {
+        userDataEditor.remove(HOST_ROOM_LONGITUDE);
+        userDataEditor.remove(HOST_ROOM_LATITUDE);
+        userDataEditor.remove(HOST_ROOM_ADDRESS);
+        userDataEditor.commit();
+    }
+
     public void clearUserData() {
         userDataEditor.clear();
         userDataEditor.commit();
+    }
+
+    //Helper function
+    private void putDouble(SharedPreferences.Editor editor, final String key, final double value) {
+        editor.putLong(key, Double.doubleToRawLongBits(value));
+    }
+
+    double getDouble(SharedPreferences session, final String key, final double defaultValue) {
+        return Double.longBitsToDouble(session.getLong(key, Double.doubleToLongBits(defaultValue)));
     }
 }
