@@ -41,7 +41,7 @@ public class LoginActivity extends AppCompatActivity {
 
         //Test thêm người chờ vào một phòng
 //        RoomEntryRequester roomEntryRequester = new RoomEntryRequester(this);
-//        Participant participant = new Participant("072777777", "Tester7",  ParticipantListEntry.STATE_IS_WAIT);
+//        Participant participant = new Participant("0123458698", "Tester8",  ParticipantListEntry.STATE_IS_WAIT);
 //        roomEntryRequester.addParticipant(participant, "-MlwbMJc0itEekqKtOtT");
 
 

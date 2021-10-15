@@ -47,6 +47,12 @@ public class SessionManager {
         return bundle;
     }
 
+    public void clearUserCurrentRoom() {
+        userDataEditor.remove(UserEntry.CURRENT_ROOM_ARM);
+        userDataEditor.putBoolean(UserEntry.IS_HOST_ARM, false);
+        userDataEditor.commit();
+    }
+
     public void clearUserData() {
         userDataEditor.clear();
         userDataEditor.commit();

@@ -1,5 +1,6 @@
 package com.android.queue.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Room {
@@ -21,6 +22,7 @@ public class Room {
                 Double latitude, Double longitude, String hostPhone) {
         this.roomData = new RoomData(roomName, address, timeStart, maxParticipant,
                 timeWait, timeDelay, waitSetting, latitude, longitude, hostPhone);
+        participantList = new ArrayList<>();
     }
 
     public Room(){}
