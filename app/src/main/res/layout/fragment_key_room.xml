@@ -40,7 +40,7 @@
         android:layout_below="@id/qrcodeImg"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="12dp"
-        android:background="null"
+        android:background="@null"
         android:src="@drawable/ic_archive" />
 
     <TextView

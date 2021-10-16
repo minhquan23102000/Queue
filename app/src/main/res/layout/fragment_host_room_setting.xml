@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.CreateRoomActivity">
-
+    tools:context=".fragment.HostRoomSettingFragment">
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
@@ -17,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="15dp"
-            android:text="Tạo phòng chờ"
+            android:text="Thiết lập phòng chờ"
             android:textAppearance="@style/TextAppearance.Reply.Headline5" />
 
 
@@ -28,54 +27,13 @@
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/hostPhoneTv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="35dp"
-                android:hint="Số điện thoại">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:inputType="phone" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/roomNameTv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/plane_16"
-                android:hint="Tên phòng chờ">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:inputType="text" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/addressTv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/plane_16"
-                android:hint="Địa chỉ phòng"
-                app:endIconDrawable="@drawable/outline_location_on_24"
-                app:endIconMode="custom">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:enabled="false"
-                    android:inputType="text" />
-            </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/timeStartTv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/plane_16"
-                android:hint="Bắt đầu trong vòng"
+                android:layout_marginTop="32dp"
+                android:hint="Tạm dừng trong vòng"
                 app:endIconDrawable="@drawable/outline_schedule_black_24"
                 app:endIconMode="custom">
 
@@ -101,38 +59,47 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/plane_16"
+                android:gravity="center_vertical">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/timeWaitTv"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Thời gian chờ"
+                    android:textAppearance="@style/TextAppearance.Reply.Subtitle1" />
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/timeWaitSlider"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/plane_16"
                     android:layout_weight="1"
-                    android:hint="Thời gian chờ"
-                    app:suffixText="phút">
+                    android:stepSize="1"
+                    android:valueFrom="1.0"
+                    android:valueTo="120.0" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:inputType="numberDecimal" />
-                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/timeDelayTv"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/plane_16"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Độ trễ khi chờ"
+                    android:textAppearance="@style/TextAppearance.Reply.Subtitle1" />
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/timeDelaySlider"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/plane_08"
-                    android:layout_marginTop="@dimen/plane_16"
                     android:layout_weight="1"
-                    android:hint="Độ trễ"
-                    app:suffixText="phút">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:inputType="numberDecimal" />
-                </com.google.android.material.textfield.TextInputLayout>
+                    android:stepSize="0.5"
+                    android:valueFrom="1.0"
+                    android:valueTo="60.0" />
 
             </LinearLayout>
 
@@ -159,17 +126,17 @@
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/createRoomBtn"
+                    android:id="@+id/pauseBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="32dp"
-                    android:text="Tạo phòng" />
+                    android:text="Tạm dừng" />
 
                 <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/backBtn"
+                    android:id="@+id/closeBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Quay lại"
+                    android:text="Đóng phòng"
                     android:textAppearance="@style/TextAppearance.Reply.Button" />
             </LinearLayout>
 
@@ -177,5 +144,6 @@
         </LinearLayout>
 
     </com.google.android.material.card.MaterialCardView>
+
 
 </RelativeLayout>

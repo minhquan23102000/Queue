@@ -12,6 +12,7 @@ import android.widget.FrameLayout;
 
 
 import com.android.queue.R;
+import com.android.queue.fragment.HostRoomSettingFragment;
 import com.android.queue.fragment.KeyRoomFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -26,7 +27,6 @@ public class HostActivity extends AppCompatActivity implements NavigationBarView
         setContentView(R.layout.activity_host);
         //Hook view from layout
         bottomNavigationView = findViewById(R.id.bottom_navigation);
-
         bottomNavigationView.setOnItemSelectedListener(this);
     }
 
@@ -38,6 +38,7 @@ public class HostActivity extends AppCompatActivity implements NavigationBarView
                 navigateTo(new KeyRoomFragment(), false);
                 return true;
             case R.id.roomWait:
+                navigateTo(new HostRoomSettingFragment(), false);
                 return true;
             case R.id.roomSetting:
                 return true;
