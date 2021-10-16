@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
@@ -13,6 +14,7 @@ import android.widget.FrameLayout;
 
 import com.android.queue.R;
 import com.android.queue.fragment.HostRoomSettingFragment;
+import com.android.queue.fragment.HostRoomWaitingFragment;
 import com.android.queue.fragment.KeyRoomFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -28,6 +30,14 @@ public class HostActivity extends AppCompatActivity implements NavigationBarView
         //Hook view from layout
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnItemSelectedListener(this);
+
+        //If this room is first create and navigate from CreateRoomActivity, we navigate to KeyRoomFragment. Otherwise we navigate to HostRoomWaitingFragment
+        Intent intent = getIntent();
+        if (intent.getBooleanExtra("firstCreate", false)) {
+            navigateTo(new KeyRoomFragment(), false);
+        } else {
+            navigateTo(new HostRoomWaitingFragment(), false);
+        }
     }
 
 
@@ -38,9 +48,10 @@ public class HostActivity extends AppCompatActivity implements NavigationBarView
                 navigateTo(new KeyRoomFragment(), false);
                 return true;
             case R.id.roomWait:
-                navigateTo(new HostRoomSettingFragment(), false);
+                navigateTo(new HostRoomWaitingFragment(), false);
                 return true;
             case R.id.roomSetting:
+                navigateTo(new HostRoomSettingFragment(), false);
                 return true;
         }
         return false;
