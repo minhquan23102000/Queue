@@ -8,12 +8,15 @@ import android.view.View;
 
 import com.android.queue.R;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textview.MaterialTextView;
 
 public class MainActivity extends AppCompatActivity {
 
+    private MaterialTextView usernameTv;
 
     private MaterialButton logoutBtn;
     private MaterialButton createRoomBtn;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,8 +24,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         //Init all view in this activity
+        usernameTv = findViewById(R.id.usernameTv);
         logoutBtn = findViewById(R.id.logoutBtn);
         createRoomBtn = findViewById(R.id.hostBtn);
+
+        Intent intent = getIntent();
+        String mailOfUser = intent.getStringExtra("email");
+        usernameTv.setText(mailOfUser);
 
         logoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override

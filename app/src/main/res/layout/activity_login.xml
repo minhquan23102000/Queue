@@ -23,14 +23,14 @@
         android:layout_centerHorizontal="true"/>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/phoneTv"
+        android:id="@+id/mailTv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="360dp"
+        android:layout_marginTop="250dp"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="12dp"
-        android:hint="Số điện thoại">
+        android:hint="Email">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginStart="24dp"
-        android:layout_below="@id/phoneTv"
+        android:layout_below="@id/mailTv"
         android:layout_marginEnd="24dp"
         app:passwordToggleEnabled="true"
         android:hint="Mật khẩu">
@@ -55,15 +55,42 @@
     </com.google.android.material.textfield.TextInputLayout>
 
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="370dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/loginBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/passwordTv"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="14dp"
+            android:layout_marginEnd="18dp"
+            android:text="Đăng nhập" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/regBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/passwordTv"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="14dp"
+            android:layout_marginEnd="18dp"
+            android:text="Đăng ký" />
+
+    </LinearLayout>
+
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/loginBtn"
+        android:id="@+id/loginPhone"
+        android:layout_centerInParent="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/passwordTv"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="14dp"
-        android:layout_marginEnd="18dp"
-        android:text="Đăng nhập" />
+        android:layout_marginTop="100dp"
+        android:text="Đăng nhập bằng số điện thoại" />
+
 
 
 
