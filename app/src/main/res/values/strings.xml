@@ -16,7 +16,8 @@
     <string name="app_name">Queue</string>
 
     <!--BottomAppBar-->
-    <string name="bottom_app_bar_chevron_content_desc">Open or close bottom navigation drawer</string>
+    <string name="navigation_app_bar_open">Open navigation drawer</string>
+    <string name="navigation_app_bar_close">Close navigation drawer</string>
     <string name="bottom_app_bar_logo_content_desc">Reply logo</string>
     <string name="bottom_nav_drawer_profile_image_content_desc">profile avatar image</string>
     <string name="fab_compose_email_content_description">Compose new email</string>
@@ -67,4 +68,6 @@
     <string name="search_suggestion_title_yesterday">YESTERDAY</string>
     <string name="search_suggestion_title_this_week">THIS WEEK</string>
     <string name="title_activity_maps">Map</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
