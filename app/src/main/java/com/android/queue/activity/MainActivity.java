@@ -9,11 +9,8 @@ import android.view.View;
 import com.android.queue.R;
 import com.android.queue.SessionManager;
 import com.google.android.material.button.MaterialButton;
-<<<<<<< HEAD
 import com.google.android.material.textview.MaterialTextView;
-=======
 import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract.UserEntry;
->>>>>>> origin/master
 
 public class MainActivity extends AppCompatActivity {
 
