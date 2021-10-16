@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.queue.R;
@@ -19,6 +20,7 @@ import com.android.queue.firebase.storage.FirebaseStorageRequester;
 import com.android.queue.models.Room;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.android.material.timepicker.MaterialTimePicker;
@@ -50,7 +52,7 @@ public class CreateRoomActivity extends AppCompatActivity {
     private MaterialTextView backBtn;
 
     //Init array string for wait setting
-    private static final String[] WAIT_SETTING_VIEW_ITEM = new String[] {"Cân bằng", "Mặc định"};
+    private static final String[] WAIT_SETTING_VIEW_ITEM = new String[]{"Cân bằng", "Mặc định"};
 
     //Init session manager
     private SessionManager sessionManager;
@@ -110,7 +112,7 @@ public class CreateRoomActivity extends AppCompatActivity {
         timeStartInputLayout.setEndIconOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MaterialTimePicker picker  = new MaterialTimePicker.Builder()
+                MaterialTimePicker picker = new MaterialTimePicker.Builder()
                         .setTimeFormat(TimeFormat.CLOCK_24H)
                         .setHour(1)
                         .setMinute(10)
@@ -149,28 +151,84 @@ public class CreateRoomActivity extends AppCompatActivity {
             Timestamp timeStart = new Timestamp(System.currentTimeMillis() +
                     TimeUnit.MINUTES.toMillis(minute) + TimeUnit.HOURS.toMillis(hour));
 
-            //Init room model
-            Room addingRoom = new Room(roomName, address, timeStart.getTime(), maxParticipant,
-                    timeWait, timeDelay, waitSetting, roomLocation.latitude, roomLocation.longitude,
-                    hostPhone);
-            //Call romm entry requester to insert data to firebase realtime
-            String roomKey = roomEntryRequester.createARoom(addingRoom);
-            if (roomKey == null) {
-                Toast.makeText(this, "Lỗi tạo room trên cloud. Vui lòng kiểm tra đường mạng", Toast.LENGTH_SHORT).show();
+            //Valid data in layout before insert to firebase
+            boolean checkData = true;
+            if (roomName.matches("")) {
+                roomNameInputLayout.setError("Tên không thể để trống");
+                 checkData = false;
             } else {
-                //Generate a qrcode from roomKey
-                File qrcode = QRCode.from(roomKey).file();
-                //Upload QR image to firebase storage
-                firebaseStorageRequester.uploadFile(Uri.fromFile(qrcode), roomKey);
-                //Update qr file name of the room
-                roomEntryRequester.updateQrFileName(roomKey, roomKey);
-                //Update user session
-                sessionManager.putUserCurrentRoomId(roomKey, true);
+                roomNameInputLayout.setError("");
             }
+            if (hostPhone.matches("")) {
+                phoneInputLayout.setError("Số điện thoại không thể để trống");
+                checkData = false;
+            } else {
+                phoneInputLayout.setError("");
+            }
+            if (address.matches("")) {
+                addressInputLayout.setError("Địa chỉ không thể để trống");
+                checkData = false;
+            } else {
+                addressInputLayout.setError("");
+            }
+            if (checkNullEditText(timeDelayInputLayout.getEditText())) {
+                timeWaitInputLayout.setError("Thời gian chờ không thể để trống");
+                checkData = false;
+            } else {
+                timeWaitInputLayout.setError("");
+            }
+            if (checkNullEditText(timeDelayInputLayout.getEditText())) {
+                timeDelayInputLayout.setError("Độ trễ không thể bỏ trống");
+                checkData = false;
+            } else {
+                timeDelayInputLayout.setError("");
+            }
+            if (checkNullEditText(maxParticipantInputLayout.getEditText())) {
+                maxParticipantInputLayout.setError("Số lượng người tham gia không thể để trống");
+                checkData = false;
+            } else {
+                maxParticipantInputLayout.setError("");
+            }
+            if (checkNullEditText(timeStartInputLayout.getEditText())) {
+                timeStartInputLayout.setError("Thời gian bắt đầu không thể để trống");
+                checkData = false;
+            } else {
+                timeStartInputLayout.setError("");
+            }
+
+            if (checkData) {
+                //Init room model
+                Room addingRoom = new Room(roomName, address, timeStart.getTime(), maxParticipant,
+                        timeWait, timeDelay, waitSetting, roomLocation.latitude, roomLocation.longitude,
+                        hostPhone);
+                //Call romm entry requester to insert data to firebase realtime
+                String roomKey = roomEntryRequester.createARoom(addingRoom);
+                if (roomKey == null) {
+                    Toast.makeText(this, "Lỗi tạo room trên cloud. Vui lòng kiểm tra đường mạng", Toast.LENGTH_SHORT).show();
+                } else {
+                    //Generate a qrcode from roomKey
+                    File qrcode = QRCode.from(roomKey).file();
+                    //Upload QR image to firebase storage
+                    firebaseStorageRequester.uploadFile(Uri.fromFile(qrcode), roomKey);
+                    //Update qr file name of the room
+                    roomEntryRequester.updateQrFileName(roomKey, roomKey);
+                    //Update user session
+                    sessionManager.putUserCurrentRoomId(roomKey, true);
+                    //Navigate to HostActivity
+                    Intent intent = new Intent(CreateRoomActivity.this, HostActivity.class);
+                    intent.putExtra("firstCreate", true);
+                    CreateRoomActivity.this.startActivity(intent);
+                }
+            }
+
 
 
         });
 
+    }
+
+    private boolean checkNullEditText(EditText editText) {
+        return editText.getText().toString().matches("");
     }
 
     @Override
