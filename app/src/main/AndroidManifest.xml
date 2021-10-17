@@ -7,11 +7,11 @@
          location permissions for the "MyLocation" functionality.
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -22,13 +22,18 @@
         android:theme="@style/Theme.Queue"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".activity.ScanQRActivity"
+            android:exported="true" />
+        <activity
+            android:name=".activity.InputkeyActivity"
+            android:exported="true" />
+        <activity
             android:name=".activity.VerifyPhoneNumber"
             android:exported="true" />
         <activity
             android:name=".activity.RegisterActivity"
             android:exported="true" />
-        android:theme="@style/Theme.Queue">
-        <activity android:name=".activity.HostActivity"></activity>
+        <activity android:name=".activity.HostActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").

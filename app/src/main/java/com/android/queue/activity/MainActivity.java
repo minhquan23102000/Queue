@@ -19,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
     private MaterialButton logoutBtn;
     private MaterialButton createRoomBtn;
     private SessionManager sessionManager;
-
+    private MaterialButton lineBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
             usernameTv = findViewById(R.id.usernameTv);
             logoutBtn = findViewById(R.id.logoutBtn);
             createRoomBtn = findViewById(R.id.hostBtn);
-
+            lineBtn = findViewById(R.id.lineBtn);
 
             usernameTv.setText(sessionManager.getUserData().getString(UserEntry.FULL_NAME_ARM));
 
@@ -53,11 +53,21 @@ public class MainActivity extends AppCompatActivity {
                     MainActivity.this.startActivity(intent);
                 }
             });
+            
+
         }
         else {
             Intent intent = new Intent(MainActivity.this,LoginActivity.class);
             startActivity(intent);
         }
+        lineBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this,InputkeyActivity.class);
+                MainActivity.this.startActivity(intent);
+            }
+        });
+        
 
     }
 
