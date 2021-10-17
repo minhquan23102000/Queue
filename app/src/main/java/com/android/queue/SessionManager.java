@@ -34,6 +34,10 @@ public class SessionManager {
         userDataEditor.commit();
     }
 
+    public String getCurrentRoomKey() {
+        return userSession.getString(UserEntry.CURRENT_ROOM_ARM, null);
+    }
+
 
     public boolean isLogin() {
         String phone = userSession.getString(UserEntry.PHONE_ARM, null);

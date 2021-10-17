@@ -59,10 +59,10 @@ public class FirebaseStorageRequester {
 
     }
 
-    public void loadRoomQrCode(ImageView imageView, String qr) {
+    public void loadRoomQrCode(ImageView imageView, String roomKey) {
         // Create a storage reference from our app
         StorageReference storageRef = storage.getReferenceFromUrl(CLOUD_URL).child(QR_CODE_FOLDER);
-        StorageReference riverRef = storageRef.child(qr);
+        StorageReference riverRef = storageRef.child(roomKey);
 
         //Load image into ImageView
         loadingAnimation.start();
