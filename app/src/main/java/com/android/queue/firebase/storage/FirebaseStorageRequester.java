@@ -3,10 +3,13 @@ package com.android.queue.firebase.storage;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
@@ -23,9 +26,16 @@ public class FirebaseStorageRequester {
     // Create a Cloud Storage reference from the app
     private final FirebaseStorage storage;
 
+    //Loading animation
+    public CircularProgressDrawable loadingAnimation;
+
     public FirebaseStorageRequester(Context context) {
         mContext = context;
         storage = FirebaseStorage.getInstance();
+
+        loadingAnimation = new CircularProgressDrawable(mContext);
+        loadingAnimation.setStrokeWidth(5f);
+        loadingAnimation.setCenterRadius(30f);
     }
 
     public void uploadFile(Uri file, String roomKey) {
@@ -47,6 +57,20 @@ public class FirebaseStorageRequester {
             }
         });
 
+    }
+
+    public void loadRoomQrCode(ImageView imageView, String qr) {
+        // Create a storage reference from our app
+        StorageReference storageRef = storage.getReferenceFromUrl(CLOUD_URL).child(QR_CODE_FOLDER);
+        StorageReference riverRef = storageRef.child(qr);
+
+        //Load image into ImageView
+        loadingAnimation.start();
+        Glide.with(imageView.getContext())
+                .load(riverRef)
+                .placeholder(loadingAnimation)
+                .fitCenter()
+                .into(imageView);
     }
 
     public String initAnUniqueString (){
