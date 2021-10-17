@@ -30,6 +30,7 @@ import com.google.firebase.auth.PhoneAuthProvider;
 import java.util.concurrent.TimeUnit;
 
 public class VerifyPhoneNumber extends AppCompatActivity {
+    private static   final String TAG = VerifyPhoneNumber.class.getName();
 
     EditText edtNum1, edtNum2, edtNum3, edtNum4, edtNum5, edtNum6, edtPhone;
     Button btnSendOTP;
@@ -39,6 +40,8 @@ public class VerifyPhoneNumber extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private PhoneAuthProvider.ForceResendingToken mResendToken;
     private String mVerificationId;
+    private String mPhone;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +82,7 @@ public class VerifyPhoneNumber extends AppCompatActivity {
                 verifyCode(otp);
             }
         });
-        setupOTPInput();
+//        setupOTPInput();
     }
 
     private void sendVerificationCode(String number) {
@@ -104,21 +107,19 @@ public class VerifyPhoneNumber extends AppCompatActivity {
             //2. Trên một số thiết bị, các dịch vụ của Google Play phát hiện SMS đến và thực hiện quy trình xác minh mà không cần người dùng thực hiện bất kỳ hành động nào.
             System.out.println("onVerificationCompleted:" + credential);
             //tự động điền mã OTP
-            edtNum1.setText(credential.getSmsCode().substring(0,1));
-            edtNum2.setText(credential.getSmsCode().substring(1,2));
-            edtNum3.setText(credential.getSmsCode().substring(2,3));
-            edtNum4.setText(credential.getSmsCode().substring(3,4));
-            edtNum5.setText(credential.getSmsCode().substring(4,5));
-            edtNum6.setText(credential.getSmsCode().substring(5,6));
-
-            verifyCode(credential.getSmsCode());
+//            edtNum1.setText(credential.getSmsCode().substring(0,1));
+//            edtNum2.setText(credential.getSmsCode().substring(1,2));
+//            edtNum3.setText(credential.getSmsCode().substring(2,3));
+//            edtNum4.setText(credential.getSmsCode().substring(3,4));
+//            edtNum5.setText(credential.getSmsCode().substring(4,5));
+//            edtNum6.setText(credential.getSmsCode().substring(5,6));
+//            verifyCode(credential.getSmsCode());
+            signInWithPhoneAuthCredential(credential);
         }
 
         //fail
         @Override
         public void onVerificationFailed(FirebaseException e) {
-
-
             if (e instanceof FirebaseAuthInvalidCredentialsException) {
                 Toast.makeText(getApplicationContext(), "Request fail", Toast.LENGTH_SHORT).show();
             } else if (e instanceof FirebaseTooManyRequestsException) {
@@ -129,10 +130,11 @@ public class VerifyPhoneNumber extends AppCompatActivity {
         @Override
         public void onCodeSent(@NonNull String verificationId,
                                @NonNull PhoneAuthProvider.ForceResendingToken token) {
+            super.onCodeSent(verificationId, token);
             System.out.println("onCodeSent:" + verificationId);
             Toast.makeText(getApplicationContext(), "Đã gửi OTP", Toast.LENGTH_SHORT).show();
             mVerificationId = verificationId;
-            mResendToken = token;
+            mPhone = "+84"+edtPhone.getText().toString();
         }
     };
 
@@ -151,8 +153,7 @@ public class VerifyPhoneNumber extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             FirebaseUser user = task.getResult().getUser();
                             Toast.makeText(VerifyPhoneNumber.this, "Thành công", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(VerifyPhoneNumber.this, MainActivity.class);
-                            startActivity(intent);
+                            sendUserToMain(user.getPhoneNumber());
                         } else {
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
                                 Toast.makeText(VerifyPhoneNumber.this, "Lỗi", Toast.LENGTH_SHORT).show();
@@ -161,6 +162,11 @@ public class VerifyPhoneNumber extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    private void sendUserToMain(String phoneNumber) {
+        Intent intent = new Intent(VerifyPhoneNumber.this, MainActivity.class);
+        startActivity(intent);
     }
 
     @Override

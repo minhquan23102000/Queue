@@ -9,53 +9,53 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.android.queue.R;
-import com.android.queue.firebase.realtimedatabase.RoomEntryRequester;
-import com.android.queue.models.Participant;
-import com.android.queue.models.Room;
-import com.android.queue.utils.TimestampHelper;
+import com.android.queue.SessionManager;
+import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract;
+import com.android.queue.firebase.realtimedatabase.UserAccountsRequester;
+import com.android.queue.models.UserAccounts;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
-import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract.RoomEntry.ParticipantListEntry;
-import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract.RoomEntry;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 
 public class LoginActivity extends AppCompatActivity {
 
     private MaterialButton loginBtn;
-    private MaterialButton loginPhone;
     private MaterialButton regBtn;
-
-    TextInputLayout EmailTv;
+    TextInputLayout phoneTv;
     TextInputLayout passwordTv;
-    FirebaseAuth mAuth;
-    FirebaseUser mUser;
     String string_Pattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
 
+    UserAccountsRequester userAccountsRequester;
+    SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
         //Init all view in this activity
-        EmailTv = findViewById(R.id.mailTv);
+        phoneTv = findViewById(R.id.phoneTv);
         passwordTv = findViewById(R.id.passwordTv);
         loginBtn = findViewById(R.id.loginBtn);
-        loginPhone = findViewById(R.id.loginPhone);
         regBtn = findViewById(R.id.regBtn);
 
-        mAuth = FirebaseAuth.getInstance();
-        mUser = mAuth.getCurrentUser();
+        userAccountsRequester = new UserAccountsRequester(this);
+        sessionManager = new SessionManager(this);
+
 
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                loginWithEmail();
+                onClickLogin();
             }
         });
         regBtn.setOnClickListener(new View.OnClickListener() {
@@ -65,13 +65,13 @@ public class LoginActivity extends AppCompatActivity {
                 LoginActivity.this.startActivity(intent);
             }
         });
-        loginPhone.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(LoginActivity.this, VerifyPhoneNumber.class);
-                LoginActivity.this.startActivity(intent);
-            }
-        });
+//        loginPhone.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent = new Intent(LoginActivity.this, VerifyPhoneNumber.class);
+//                LoginActivity.this.startActivity(intent);
+//            }
+//        });
 
 
         //Test thêm người chờ vào một phòng
@@ -81,36 +81,45 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    private void loginWithEmail(){
-        String email = EmailTv.getEditText().getText().toString();
+    private void onClickLogin(){
+        String phone = phoneTv.getEditText().getText().toString();
         String pass = passwordTv.getEditText().getText().toString();
-        if (!email.matches(string_Pattern)){
-            EmailTv.setError("Email không hợp lệ");
-        }
-        else if (pass.isEmpty() || pass.length()< 8){
-            passwordTv.setError("Mật khẩu nhập vào không hợp lệ");
-        }
-        else{
-            Toast.makeText(LoginActivity.this, "Đang đăng nhập...", Toast.LENGTH_SHORT).show();
-            mAuth.signInWithEmailAndPassword(email, pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (task.isSuccessful()){
-                        Toast.makeText(LoginActivity.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
-                        sendUserToHome(email);
+        DatabaseReference databaseReference = userAccountsRequester.getmDatabase();
+        Query query = databaseReference.orderByChild("phone").equalTo(phone.trim());
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot user : dataSnapshot.getChildren()) {
+                        UserAccounts userAccounts = user.getValue(UserAccounts.class);
+                        if (userAccounts.password.equals(pass)) {
+                            Toast.makeText(LoginActivity.this, " Đăng nhập thành công", Toast.LENGTH_LONG).show();
+                            sessionManager.initUserSession(phone,userAccounts.fullName);
+                            sessionManager.isLogin();
+                            sendUserToHome();
+                        } else {
+                            Toast.makeText(LoginActivity.this, "Sai mật khẩu", Toast.LENGTH_LONG).show();
+                        }
                     }
-                    else{
-                        Toast.makeText(LoginActivity.this, "Lỗi không xác định", Toast.LENGTH_SHORT).show();
-                    }
+                } else {
+                    Toast.makeText(LoginActivity.this, "Tài khoản không tồn tại", Toast.LENGTH_LONG).show();
                 }
-            });
-        }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
-    private void sendUserToHome(String values) {
+
+
+
+
+    private void sendUserToHome() {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.putExtra("email", values);
         startActivity(intent);
     }
 }

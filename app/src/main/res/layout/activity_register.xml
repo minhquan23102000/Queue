@@ -28,12 +28,25 @@
         android:layout_marginTop="250dp"
         android:orientation="vertical">
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/EmailTv"
+            android:id="@+id/phoneTv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
-            android:hint="Email">
+            android:hint="Số điện thoại">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/nameTv"
+            android:layout_marginTop="15dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:hint="Họ tên">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
@@ -47,7 +60,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_marginStart="24dp"
-            android:layout_below="@id/EmailTv"
+            android:layout_below="@id/phoneTv"
             android:layout_marginEnd="24dp"
             app:passwordToggleEnabled="true"
             android:hint="Mật khẩu">

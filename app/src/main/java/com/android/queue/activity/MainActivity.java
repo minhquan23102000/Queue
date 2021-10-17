@@ -27,30 +27,38 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         //Init session manager
         sessionManager = new SessionManager(this);
-        //Init all view in this activity
-        usernameTv = findViewById(R.id.usernameTv);
-        logoutBtn = findViewById(R.id.logoutBtn);
-        createRoomBtn = findViewById(R.id.hostBtn);
 
-        Intent intent = getIntent();
-        String mailOfUser = intent.getStringExtra("email");
-        usernameTv.setText(mailOfUser);
+        if (sessionManager.isLogin()){
+            //Init all view in this activity
+            usernameTv = findViewById(R.id.usernameTv);
+            logoutBtn = findViewById(R.id.logoutBtn);
+            createRoomBtn = findViewById(R.id.hostBtn);
 
-        logoutBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                MainActivity.this.startActivity(intent);
-            }
-        });
 
-        createRoomBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, CreateRoomActivity.class);
-                MainActivity.this.startActivity(intent);
-            }
-        });
+            usernameTv.setText(sessionManager.getUserData().getString(UserEntry.FULL_NAME_ARM));
+
+            logoutBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    sessionManager.clearUserData();
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    MainActivity.this.startActivity(intent);
+                }
+            });
+
+            createRoomBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(MainActivity.this, CreateRoomActivity.class);
+                    MainActivity.this.startActivity(intent);
+                }
+            });
+        }
+        else {
+            Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+            startActivity(intent);
+        }
+
     }
 
     @Override
@@ -61,8 +69,8 @@ public class MainActivity extends AppCompatActivity {
         Bundle userData = sessionManager.getUserData();
         if (userData.getString(UserEntry.CURRENT_ROOM_ARM, null) != null) {
             if (userData.getBoolean(UserEntry.IS_HOST_ARM, false)) {
-                Intent intent = new Intent(MainActivity.this, HostActivity.class);
-                MainActivity.this.startActivity(intent);
+//                Intent intent = new Intent(MainActivity.this, HostActivity.class);
+//                MainActivity.this.startActivity(intent);
             }
         }
     }
