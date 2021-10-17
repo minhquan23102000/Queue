@@ -75,9 +75,6 @@ public class CreateRoomActivity extends AppCompatActivity {
         roomEntryRequester = new RoomEntryRequester(this);
         firebaseStorageRequester = new FirebaseStorageRequester(this);
 
-        //Init test session user data
-        sessionManager.initUserSession("0123458787", "Trần Đức Chính");
-
         //Find all view needed
         phoneInputLayout = findViewById(R.id.hostPhoneTv);
         roomNameInputLayout = findViewById(R.id.roomNameTv);
