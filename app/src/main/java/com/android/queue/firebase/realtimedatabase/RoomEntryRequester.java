@@ -75,6 +75,15 @@ public class RoomEntryRequester {
     }
 
     /**
+     * Method to update a specific field data of a room
+     * **/
+    public void update(String fieldName, Object data, DatabaseReference roomData) {
+        roomData.child(fieldName)
+                .setValue(data)
+                .addOnFailureListener(e -> Toast.makeText(mContext, "Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show());
+    }
+
+    /**
      * Method to update qr file name of a room
      * **/
     public void updateQrFileName(String fileName, String roomKey) {
