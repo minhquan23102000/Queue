@@ -1,11 +1,13 @@
 package com.android.queue.activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -15,6 +17,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.queue.R;
+import com.android.queue.firebase.realtimedatabase.UserAccountsRequester;
+import com.android.queue.models.UserAccounts;
+import com.android.queue.utils.MD5Encode;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
@@ -30,26 +35,30 @@ import com.google.firebase.auth.PhoneAuthProvider;
 import java.util.concurrent.TimeUnit;
 
 public class VerifyPhoneNumber extends AppCompatActivity {
-    private static   final String TAG = VerifyPhoneNumber.class.getName();
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
+    private PhoneAuthProvider.ForceResendingToken mResendToken;
+
+    private UserAccountsRequester userAccountsRequester;
+
+    private String TAG = "firebase - REGISTER";
+    private String mVerificationId;
 
     EditText edtNum1, edtNum2, edtNum3, edtNum4, edtNum5, edtNum6, edtPhone;
     Button btnSendOTP;
     Button btnVerify;
 
-    private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
-    private PhoneAuthProvider.ForceResendingToken mResendToken;
-    private String mVerificationId;
-    private String mPhone;
+    String name_intent;
+    String phone_intent;
+    String pass_intent;
 
+    private String mPhone;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_verify_phone_number);
-
         mAuth = FirebaseAuth.getInstance();
-
         edtNum1 = findViewById(R.id.edtNum1);
         edtNum2 = findViewById(R.id.edtNum2);
         edtNum3 = findViewById(R.id.edtNum3);
@@ -60,13 +69,29 @@ public class VerifyPhoneNumber extends AppCompatActivity {
         btnSendOTP = findViewById(R.id.btnSendOTP);
         btnVerify = findViewById(R.id.btnVerify);
 
+        userAccountsRequester = new UserAccountsRequester(this);
+
+
+
+        Intent intent = getIntent();
+         name_intent = intent.getStringExtra("name");
+         phone_intent = intent.getStringExtra("phone");
+         pass_intent = intent.getStringExtra("pass");
+
+         //
+        String cv_phone = phone_intent.replace("0","+84");
+
+        edtPhone.setText(phone_intent);
+        Toast.makeText(getApplicationContext(), name_intent+phone_intent+pass_intent, Toast.LENGTH_SHORT).show();
+
+        mPhone = cv_phone;
 
 
         btnSendOTP.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Toast.makeText(getApplicationContext(), "Vui lòng đợi", Toast.LENGTH_SHORT).show();
-                sendVerificationCode("+84" + edtPhone.getText().toString());
+                sendVerificationCode(mPhone);
             }
         });
 
@@ -82,9 +107,9 @@ public class VerifyPhoneNumber extends AppCompatActivity {
                 verifyCode(otp);
             }
         });
-//        setupOTPInput();
     }
 
+    //đăng nhập bằng sđt
     private void sendVerificationCode(String number) {
         PhoneAuthOptions options =
                 PhoneAuthOptions.newBuilder(mAuth)
@@ -105,7 +130,9 @@ public class VerifyPhoneNumber extends AppCompatActivity {
             //Hàm này được gọi trong hai trường hợp:
             //1. Trong một số trường hợp, điện thoại di động được xác minh tự động mà không cần mã xác minh.
             //2. Trên một số thiết bị, các dịch vụ của Google Play phát hiện SMS đến và thực hiện quy trình xác minh mà không cần người dùng thực hiện bất kỳ hành động nào.
-            System.out.println("onVerificationCompleted:" + credential);
+//            Log.d(TAG, "onVerificationCompleted:" + credential);
+//            Toast.makeText(VerifyPhoneNumber.this, credential.getSmsCode(),Toast.LENGTH_SHORT).show();
+//            System.out.println(credential.getSmsCode());
             //tự động điền mã OTP
 //            edtNum1.setText(credential.getSmsCode().substring(0,1));
 //            edtNum2.setText(credential.getSmsCode().substring(1,2));
@@ -113,34 +140,35 @@ public class VerifyPhoneNumber extends AppCompatActivity {
 //            edtNum4.setText(credential.getSmsCode().substring(3,4));
 //            edtNum5.setText(credential.getSmsCode().substring(4,5));
 //            edtNum6.setText(credential.getSmsCode().substring(5,6));
+
 //            verifyCode(credential.getSmsCode());
-            signInWithPhoneAuthCredential(credential);
         }
 
         //fail
         @Override
         public void onVerificationFailed(FirebaseException e) {
+            Log.w(TAG, "onVerificationFailed", e);
+            Toast.makeText(VerifyPhoneNumber.this, "Thất bại",Toast.LENGTH_SHORT).show();
             if (e instanceof FirebaseAuthInvalidCredentialsException) {
-                Toast.makeText(getApplicationContext(), "Request fail", Toast.LENGTH_SHORT).show();
+                Toast.makeText(VerifyPhoneNumber.this, "yêu cầu thất bại",Toast.LENGTH_SHORT).show();
             } else if (e instanceof FirebaseTooManyRequestsException) {
-                Toast.makeText(getApplicationContext(), "Quota không đủ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(VerifyPhoneNumber.this, "Quota không đủ",Toast.LENGTH_SHORT).show();
             }
         }
 
         @Override
         public void onCodeSent(@NonNull String verificationId,
                                @NonNull PhoneAuthProvider.ForceResendingToken token) {
-            super.onCodeSent(verificationId, token);
-            System.out.println("onCodeSent:" + verificationId);
+            Log.d(TAG, "onCodeSent:" + verificationId);
             Toast.makeText(getApplicationContext(), "Đã gửi OTP", Toast.LENGTH_SHORT).show();
             mVerificationId = verificationId;
-            mPhone = "+84"+edtPhone.getText().toString();
+            mResendToken = token;
         }
     };
 
     //code xác thực OTP
     private void verifyCode(String code) {
-        Toast.makeText(VerifyPhoneNumber.this, "Đang xác thực", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(MainActivity.this, "Đang xác thực",Toast.LENGTH_SHORT).show();
         PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, code);
         signInWithPhoneAuthCredential(credential);
     }
@@ -151,21 +179,33 @@ public class VerifyPhoneNumber extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+                            Log.d(TAG, "signInWithCredential:success");
                             FirebaseUser user = task.getResult().getUser();
-                            Toast.makeText(VerifyPhoneNumber.this, "Thành công", Toast.LENGTH_SHORT).show();
-                            sendUserToMain(user.getPhoneNumber());
-                        } else {
-                            if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-                                Toast.makeText(VerifyPhoneNumber.this, "Lỗi", Toast.LENGTH_SHORT).show();
+                            String encrypts = MD5Encode.endCode(pass_intent);
+                            UserAccounts userAccounts = new UserAccounts(name_intent, phone_intent,encrypts);
+                            String accKey = userAccountsRequester.createAnUserAccount(userAccounts);
+                            if (accKey != null){
+                                Toast.makeText(VerifyPhoneNumber.this,"Đăng kí thành công", Toast.LENGTH_SHORT).show();
+                                sendUserToLogin();
+                            }
+                            else{
+                                Toast.makeText(VerifyPhoneNumber.this,"Đăng kí thất bại", Toast.LENGTH_SHORT).show();
+                            }
+                            Toast.makeText(VerifyPhoneNumber.this, "Thành công",Toast.LENGTH_SHORT).show();
 
+                        } else {
+                            Log.w(TAG, "signInWithCredential:failure", task.getException());
+                            if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+                                Toast.makeText(VerifyPhoneNumber.this, "Lỗi",Toast.LENGTH_SHORT).show();
                             }
                         }
                     }
                 });
     }
 
-    private void sendUserToMain(String phoneNumber) {
-        Intent intent = new Intent(VerifyPhoneNumber.this, MainActivity.class);
+    private void sendUserToLogin() {
+        Intent intent = new Intent(VerifyPhoneNumber.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
 
@@ -177,125 +217,5 @@ public class VerifyPhoneNumber extends AppCompatActivity {
         }
     }
 
-
-    private void setupOTPInput() {
-
-        edtNum1.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!s.toString().trim().isEmpty()) {
-                    edtNum2.requestFocus();
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-        edtNum2.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!s.toString().trim().isEmpty()) {
-                    edtNum3.requestFocus();
-                } else {
-                    edtNum1.requestFocus();
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-        edtNum3.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!s.toString().trim().isEmpty()) {
-                    edtNum4.requestFocus();
-                } else {
-                    edtNum2.requestFocus();
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-        edtNum4.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!s.toString().trim().isEmpty()) {
-                    edtNum5.requestFocus();
-                } else {
-                    edtNum3.requestFocus();
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-        edtNum5.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!s.toString().trim().isEmpty()) {
-                    edtNum6.requestFocus();
-                } else {
-                    edtNum4.requestFocus();
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-        edtNum6.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.toString().trim().isEmpty()) {
-                    edtNum5.requestFocus();
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-    }
 
 }

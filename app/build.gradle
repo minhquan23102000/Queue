@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "com.android.queue"
-        minSdkVersion 27
+        minSdkVersion 26
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -46,6 +46,9 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-storage:6.4.0'
 
     //Test service
+    implementation platform('com.google.firebase:firebase-bom:28.4.2')
+    implementation 'com.google.firebase:firebase-auth'
+
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

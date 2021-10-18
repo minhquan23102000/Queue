@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Toast;
 
@@ -18,6 +20,10 @@ import com.google.firebase.auth.FirebaseUser;
 import com.android.queue.R;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 public class RegisterActivity extends AppCompatActivity {
     TextInputLayout phoneTv;
@@ -28,10 +34,10 @@ public class RegisterActivity extends AppCompatActivity {
     private UserAccountsRequester userAccountsRequester;
 
 
-    FirebaseAuth mAuth;
-    FirebaseUser mUser;
+    public boolean validData = false ;
 
-    String string_Pattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +49,12 @@ public class RegisterActivity extends AppCompatActivity {
         passwordTv = findViewById(R.id.passwordTv);
         re_passwordTv = findViewById(R.id.re_passwordTv);
         regBtn = findViewById(R.id.regBtn);
+        regBtn.setEnabled(false);
+
+        phoneTv.getEditText().addTextChangedListener(textWatcher);
+        nameTv.getEditText().addTextChangedListener(textWatcher);
+        passwordTv.getEditText().addTextChangedListener(textWatcher);
+        re_passwordTv.getEditText().addTextChangedListener(textWatcher);
 
         userAccountsRequester = new UserAccountsRequester(this);
         regBtn.setOnClickListener(new View.OnClickListener() {
@@ -53,6 +65,86 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
+    //Validate
+    private TextWatcher textWatcher = new TextWatcher() {
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            if (phoneTv.getEditText().getText().toString().length()==0) {
+                phoneTv.setError("Số điện thoại không được để trống");
+                phoneTv.setEnabled(true);
+                validData = false;
+            }
+            else if (!phoneTv.getEditText().getText().toString().matches("[0-9]+") || phoneTv.getEditText().getText().length() != 10) {
+                validData = false;
+                phoneTv.setError("Số điện thoại không hợp lệ");
+            }
+            else{
+                Query query = userAccountsRequester.getmDatabase().orderByChild("phone").equalTo(phoneTv.getEditText().getText().toString().trim());
+                query.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if (dataSnapshot.exists()) {
+                            validData = false;
+                            phoneTv.setError("Số điện thoại đã được đăng kí");
+                            phoneTv.requestFocus();
+                        } else {
+                            phoneTv.setError(null);
+                        }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+            }
+            if (nameTv.getEditText().getText().toString().matches("")) {
+                nameTv.setError("Họ tên không được để trống");
+                validData = false;
+            } else {
+                nameTv.setError(null);
+            }
+            if (passwordTv.getEditText().getText().toString().matches("")){
+                passwordTv.setError("Mật khẩu không được để trống");
+                validData = false;
+            }
+            else {
+                passwordTv.setError(null);
+            }
+            if (passwordTv.getEditText().getText().length() < 6){
+                passwordTv.setError("Mật khẩu tối thiểu phải 6 kí tự");
+                validData = false;
+            }
+            else {
+                passwordTv.setError(null);
+            }
+            if (!re_passwordTv.getEditText().getText().toString().equals(passwordTv.getEditText().getText().toString())){
+                re_passwordTv.setError("Mật khẩu không trùng khớp");
+                validData = false;
+            }
+            else {
+                re_passwordTv.setError(null);
+                validData = true;
+            }
+            if (validData){
+                regBtn.setEnabled(true);
+            }
+            else {
+                regBtn.setEnabled(false);
+
+            }
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+        @Override
+        public void afterTextChanged(Editable editable) {
+        }
+    };
+
 
     private void onClickRegister() {
         String phone = phoneTv.getEditText().getText().toString();
@@ -60,66 +152,9 @@ public class RegisterActivity extends AppCompatActivity {
         String pass = passwordTv.getEditText().getText().toString();
         String re_pass = re_passwordTv.getEditText().getText().toString();
 
-        //check data
-        boolean validData = true;
-        if (phone.matches("")){
-            phoneTv.setError("Số điện thoại không được để trống");
-            validData = false;
-        }
-        else{
-            phoneTv.setError("");
-        }
-        if (phone.matches("[0-9]+") && phone.length() > 2) {
-            validData = true;
-            phoneTv.setError("");
-        }
-        else{
-            validData = false;
-            phoneTv.setError("Số điện thoại không hợp lệ");
-        }
-        if (name.matches("")){
-            nameTv.setError("Họ tên không được để trống");
-            validData = false;
-        }
-        else{
-            nameTv.setError("");
-        }
-        if (pass.matches("")){
-            passwordTv.setError("Mật khẩu không được để trống");
-            validData = false;
-        }
-        else{
-            passwordTv.setError("");
-        }
-        if (pass.length() < 6){
-            passwordTv.setError("Mật khẩu tối thiểu phải 6 kí tự");
-            validData = false;
-        }
-        else{
-            passwordTv.setError("");
-        }
-        if (!re_pass.equals(pass)){
-            re_passwordTv.setError("Mật khẩu không trùng khớp");
-            validData = false;
-        }
-        else{
-            re_passwordTv.setError("");
+        sendUserToVerifyPhone(name, phone, pass);
         }
 
-        if (validData){
-            String encrypts = MD5Encode.endCode(pass);
-//            System.out.println(encrypts);
-            UserAccounts account = new UserAccounts(name, phone ,encrypts);
-            String accKey = userAccountsRequester.createAnUserAccount(account);
-            if (accKey != null){
-                Toast.makeText(this,"Đăng kí thành công", Toast.LENGTH_SHORT).show();
-                sendUserToLogin();
-            }
-            else{
-                Toast.makeText(this,"Đăng kí thất bại", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
 
 
 
@@ -127,6 +162,16 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void sendUserToLogin() {
         Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+    }
+
+    private void sendUserToVerifyPhone(String name, String phone, String pass) {
+        Intent intent = new Intent(RegisterActivity.this, VerifyPhoneNumber.class);
+        intent.putExtra("name",name);
+        intent.putExtra("phone",phone);
+
+        intent.putExtra("pass",pass);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
