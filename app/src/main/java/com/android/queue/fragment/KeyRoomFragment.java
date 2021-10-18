@@ -115,7 +115,7 @@ public class KeyRoomFragment extends Fragment {
                         .setExternal(true)
                         .save(qrcode);
 
-                Snackbar.make(view, "Mã qr đã được lưu thành công", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Mã qr đã được lưu thành công", Snackbar.LENGTH_INDEFINITE)
                         .setAction("Xem mã", v1 -> {
                             Intent intent = new Intent();
                             intent.setAction(android.content.Intent.ACTION_VIEW);

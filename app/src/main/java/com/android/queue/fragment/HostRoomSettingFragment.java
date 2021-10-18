@@ -1,14 +1,38 @@
 package com.android.queue.fragment;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.TextView;
 
 import com.android.queue.R;
+import com.android.queue.SessionManager;
+import com.android.queue.firebase.realtimedatabase.RoomEntryRequester;
+import com.android.queue.models.RoomData;
+import com.android.queue.utils.TimestampHelper;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.slider.Slider;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputLayout;
+import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract.RoomEntry.RoomDataEntry;
+import com.google.android.material.textview.MaterialTextView;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -17,33 +41,35 @@ import com.android.queue.R;
  */
 public class HostRoomSettingFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    public static final String TAG = HostRoomSettingFragment.class.getName();
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    //Init view
+    private TextView timeStartTextView;
+    private TextInputLayout maxParticipantTextInput;
+    private Slider timeWaitSlider;
+    private Slider timeDelaySlider;
+    private MaterialTextView closeRoomBtn;
+    private MaterialButton pauseRoomBtn;
+    private TextInputLayout waitSettingInputLayout;
+    private AutoCompleteTextView waitSettingTextView;
 
-    public HostRoomSettingFragment() {
-        // Required empty public constructor
-    }
+    //Init session manager and firebase service
+    private SessionManager sessionManager;
+    private RoomEntryRequester roomEntryRequester;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment HostRoomSettingFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static HostRoomSettingFragment newInstance(String param1, String param2) {
+    //Init context and activity
+    private Context mContext;
+    private Activity mActivity;
+
+    //Init model
+    private RoomData thisRoom;
+
+    //Init array string for wait setting
+    private static final String[] WAIT_SETTING_VIEW_ITEM = new String[]{"Cân bằng", "Mặc định"};
+
+    public static HostRoomSettingFragment newInstance() {
         HostRoomSettingFragment fragment = new HostRoomSettingFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -52,15 +78,90 @@ public class HostRoomSettingFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+
         }
+        mContext = getContext();
+        mActivity = getActivity();
+        sessionManager = new SessionManager(mContext);
+        roomEntryRequester = new RoomEntryRequester(mContext);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_host_room_setting, container, false);
+        View view =  inflater.inflate(R.layout.fragment_host_room_setting, container, false);
+
+        //Hook view
+        timeStartTextView = view.findViewById(R.id.timeStartTv);
+        timeDelaySlider = view.findViewById(R.id.timeDelaySlider);
+        timeWaitSlider = view.findViewById(R.id.timeWaitSlider);
+        maxParticipantTextInput = view.findViewById(R.id.maxParticipantTv);
+        closeRoomBtn = view.findViewById(R.id.closeBtn);
+        pauseRoomBtn = view.findViewById(R.id.pauseBtn);
+
+        //Create layout for wait setting
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(mContext, R.layout.spinner_item_layout, WAIT_SETTING_VIEW_ITEM);
+        waitSettingTextView = view.findViewById(R.id.filled_exposed_dropdown);
+        waitSettingTextView.setAdapter(adapter);
+
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        DatabaseReference currentRoom = roomEntryRequester.find(sessionManager.getCurrentRoomKey());
+
+        currentRoom.child(RoomDataEntry.ROOT_NAME).addValueEventListener(eventListener);
+    }
+
+    private final ValueEventListener eventListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+            //Get data transferred from firebase with getValue method from dataSnapshot
+            thisRoom = snapshot.getValue(RoomData.class);
+            Log.d(TAG, "onDataChange: "  + thisRoom.timeWait.floatValue() + thisRoom.maxParticipant);
+
+            timeStartTextView.setText("Bắt đầu vào: " + TimestampHelper.toDatetime(thisRoom.timeStart));
+
+            float timeWait = thisRoom.timeWait.floatValue();
+            timeWaitSlider.setValue(timeWait);
+            timeWaitSlider.setValueFrom(timeWait - 60);
+            timeWaitSlider.setValueTo(timeWait + 60);
+
+            float timeDelay = thisRoom.timeDelay.floatValue();
+            timeDelaySlider.setValue(timeDelay);
+            timeDelaySlider.setValueFrom(timeDelay - 30);
+            timeDelaySlider.setValueTo(timeDelay+ 30.0f);
+
+            maxParticipantTextInput.getEditText().setText(thisRoom.maxParticipant + "");
+
+            waitSettingTextView.setText(WAIT_SETTING_VIEW_ITEM[getWaitIndex()], false);
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError error) {
+            Snackbar.make(getView(), "Lỗi đường truyền không ổn định", Snackbar.LENGTH_INDEFINITE);
+        }
+    };
+
+    private String getWaitSetting() {
+        String selectValue = waitSettingTextView.getText().toString().trim();
+        if (selectValue.equals(WAIT_SETTING_VIEW_ITEM[0])) {
+            return RoomDataEntry.BALANCE_WAIT;
+        } else {
+            return RoomDataEntry.CONSTANT_WAIT;
+        }
+    }
+
+    private int getWaitIndex() {
+       if (thisRoom.waitSetting.equals(RoomDataEntry.CONSTANT_WAIT)) {
+           return 0;
+       } else {
+           return 1;
+       }
     }
 }
