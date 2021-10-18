@@ -28,21 +28,14 @@
             android:orientation="vertical">
 
 
-            <com.google.android.material.textfield.TextInputLayout
+            <TextView
                 android:id="@+id/timeStartTv"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="32dp"
-                android:hint="Tạm dừng trong vòng"
-                app:endIconDrawable="@drawable/outline_schedule_black_24"
-                app:endIconMode="custom">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:enabled="false"
-                    android:inputType="text" />
-            </com.google.android.material.textfield.TextInputLayout>
+                android:layout_gravity="start"
+                android:text="Bắt đầu vào: "
+                android:textAppearance="@style/TextAppearance.Reply.Body1" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/maxParticipantTv"

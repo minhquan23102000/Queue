@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="50dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="24dp"
             android:text="Số chờ hiện tại"
             android:textAppearance="@style/TextAppearance.Reply.Subtitle2" />
 
@@ -31,7 +31,8 @@
             android:drawableStart="@drawable/outline_phone_24"
             android:drawablePadding="18dp"
             android:text="0183645789"
-            android:textAppearance="@style/TextAppearance.Reply.Body1" />
+            android:textAppearance="@style/TextAppearance.Reply.Body1"
+            android:textIsSelectable="true" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/participantNameTv"
@@ -44,13 +45,14 @@
             android:drawableStart="@drawable/outline_person_24"
             android:drawablePadding="8dp"
             android:text="Trần Đức Chính"
-            android:textAppearance="@style/TextAppearance.Reply.Body1" />
+            android:textAppearance="@style/TextAppearance.Reply.Body1"
+            android:textIsSelectable="true" />
 
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="45dp"
-            android:layout_marginTop="32dp">
+            android:layout_marginTop="52dp">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -72,7 +74,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_marginStart="56dp"
-            android:layout_marginBottom="56dp"
+            android:layout_marginBottom="42dp"
             android:text="Đã xử lý" />
 
         <com.google.android.material.textview.MaterialTextView
@@ -81,7 +83,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_marginStart="48dp"
-            android:layout_marginBottom="70dp"
+            android:layout_marginBottom="57dp"
             android:layout_toRightOf="@id/doneBtn"
             android:text="Bỏ qua lượt"
             android:textAppearance="@style/TextAppearance.Reply.Button" />
@@ -98,8 +100,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="8dp"
-            android:headerDividersEnabled="true"
             android:divider="@color/reply_orange_400"
+            android:headerDividersEnabled="true"
             android:minHeight="40dp" />
 
 
