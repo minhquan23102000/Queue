@@ -60,6 +60,14 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this,LoginActivity.class);
             startActivity(intent);
         }
+        //If user is already in a room, we navigate to that room
+        if (sessionManager.getCurrentRoomKey() != null) {
+            if (sessionManager.getUserData().getBoolean(UserEntry.IS_HOST_ARM, true)) {
+                Intent intent = new Intent(MainActivity.this, HostActivity.class);
+                startActivity(intent);
+            }
+        }
+
         lineBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
