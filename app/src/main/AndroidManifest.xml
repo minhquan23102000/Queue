@@ -22,6 +22,9 @@
         android:theme="@style/Theme.Queue"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".activity.LinedUpActivity"
+            android:exported="true" />
+        <activity
             android:name=".activity.ScanQRActivity"
             android:exported="true" />
         <activity
