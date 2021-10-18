@@ -217,6 +217,35 @@ public class HostRoomSettingFragment extends Fragment {
             }
         });
 
+        //Thêm event cho spinner TimeDelay  để cập nhật data lên firebase
+        timeDelaySlider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
+            @Override
+            public void onStartTrackingTouch(@NonNull Slider slider) {
+
+            }
+            @Override
+            public void onStopTrackingTouch(@NonNull Slider slider) {
+                currentRoomRef.child(RoomDataEntry.ROOT_NAME)
+                        .child(RoomDataEntry.TIME_DELAY_ARM)
+                        .setValue(slider.getValue())
+                        .addOnFailureListener(e -> Toast.makeText(mContext, "Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show());
+            }
+        });
+
+        //Thêm event cho spinner TimeWait để cập nhật data lên firebase
+        timeWaitSlider.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
+            @Override
+            public void onStartTrackingTouch(@NonNull Slider slider) {
+
+            }
+            @Override
+            public void onStopTrackingTouch(@NonNull Slider slider) {
+                currentRoomRef.child(RoomDataEntry.ROOT_NAME)
+                        .child(RoomDataEntry.TIME_WAIT_ARM)
+                        .setValue(slider.getValue())
+                        .addOnFailureListener(e -> Toast.makeText(mContext, "Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show());
+            }
+        });
         return view;
     }
 
