@@ -53,22 +53,20 @@ public class MainActivity extends AppCompatActivity {
                     MainActivity.this.startActivity(intent);
                 }
             });
-            
+
+            lineBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(MainActivity.this,InputkeyActivity.class);
+                    MainActivity.this.startActivity(intent);
+                }
+            });
 
         }
         else {
             Intent intent = new Intent(MainActivity.this,LoginActivity.class);
             startActivity(intent);
         }
-        lineBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this,InputkeyActivity.class);
-                MainActivity.this.startActivity(intent);
-            }
-        });
-        
-
     }
 
     @Override

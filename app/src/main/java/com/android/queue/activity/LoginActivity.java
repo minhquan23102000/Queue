@@ -13,6 +13,7 @@ import com.android.queue.SessionManager;
 import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract;
 import com.android.queue.firebase.realtimedatabase.UserAccountsRequester;
 import com.android.queue.models.UserAccounts;
+import com.android.queue.utils.MD5Encode;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
@@ -84,6 +85,7 @@ public class LoginActivity extends AppCompatActivity {
     private void onClickLogin(){
         String phone = phoneTv.getEditText().getText().toString();
         String pass = passwordTv.getEditText().getText().toString();
+        String encrypts = MD5Encode.endCode(pass);
         DatabaseReference databaseReference = userAccountsRequester.getmDatabase();
         Query query = databaseReference.orderByChild("phone").equalTo(phone.trim());
         query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -92,7 +94,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot user : dataSnapshot.getChildren()) {
                         UserAccounts userAccounts = user.getValue(UserAccounts.class);
-                        if (userAccounts.password.equals(pass)) {
+                        if (userAccounts.password.equals(encrypts)) {
                             Toast.makeText(LoginActivity.this, " Đăng nhập thành công", Toast.LENGTH_LONG).show();
                             sessionManager.initUserSession(phone,userAccounts.fullName);
                             sessionManager.isLogin();

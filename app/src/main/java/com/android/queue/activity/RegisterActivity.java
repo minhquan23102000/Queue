@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import com.android.queue.firebase.realtimedatabase.UserAccountsRequester;
 import com.android.queue.models.UserAccounts;
+import com.android.queue.utils.MD5Encode;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -106,7 +107,9 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         if (validData){
-            UserAccounts account = new UserAccounts(name, phone ,pass);
+            String encrypts = MD5Encode.endCode(pass);
+//            System.out.println(encrypts);
+            UserAccounts account = new UserAccounts(name, phone ,encrypts);
             String accKey = userAccountsRequester.createAnUserAccount(account);
             if (accKey != null){
                 Toast.makeText(this,"Đăng kí thành công", Toast.LENGTH_SHORT).show();
