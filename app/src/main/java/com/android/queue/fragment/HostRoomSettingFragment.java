@@ -14,6 +14,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
@@ -251,6 +252,19 @@ public class HostRoomSettingFragment extends Fragment {
         //Thêm formatter cho slider
         timeWaitSlider.setLabelFormatter(value -> (int)value + " phút");
         timeDelaySlider.setLabelFormatter(value -> value + " phút");
+
+        //Thêm event cho autocomplete textview waitSetting, để update lên firebase.
+        waitSettingTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String waitSetting = getWaitSetting(WAIT_SETTING_VIEW_ITEM[position]);
+                currentRoomRef.child(RoomDataEntry.ROOT_NAME)
+                        .child(RoomDataEntry.WAIT_SETTING_ARM)
+                        .setValue(waitSetting)
+                        .addOnFailureListener(e -> Toast.makeText(mContext, "Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show());
+            }
+        });
+
         return view;
     }
 
@@ -294,8 +308,7 @@ public class HostRoomSettingFragment extends Fragment {
         }
     };
 
-    private String getWaitSetting() {
-        String selectValue = waitSettingTextView.getText().toString().trim();
+    private String getWaitSetting(String selectValue) {
         if (selectValue.equals(WAIT_SETTING_VIEW_ITEM[0])) {
             return RoomDataEntry.BALANCE_WAIT;
         } else {
@@ -305,9 +318,9 @@ public class HostRoomSettingFragment extends Fragment {
 
     private int getWaitIndex() {
         if (thisRoom.waitSetting.equals(RoomDataEntry.CONSTANT_WAIT)) {
-            return 0;
-        } else {
             return 1;
+        } else {
+            return 0;
         }
     }
 }
