@@ -2,6 +2,7 @@ package com.android.queue.fragment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,13 +16,17 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.queue.R;
 import com.android.queue.SessionManager;
 import com.android.queue.firebase.realtimedatabase.RoomEntryRequester;
 import com.android.queue.models.RoomData;
 import com.android.queue.utils.TimestampHelper;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.slider.Slider;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
@@ -64,6 +69,9 @@ public class HostRoomSettingFragment extends Fragment {
     //Init model
     private RoomData thisRoom;
 
+    //Data ref for this room
+    private DatabaseReference currentRoomRef;
+
     //Init array string for wait setting
     private static final String[] WAIT_SETTING_VIEW_ITEM = new String[]{"Cân bằng", "Mặc định"};
 
@@ -105,6 +113,33 @@ public class HostRoomSettingFragment extends Fragment {
         waitSettingTextView = view.findViewById(R.id.filled_exposed_dropdown);
         waitSettingTextView.setAdapter(adapter);
 
+
+        //Đóng phòng, nếu trong phòng còn người xếp hàng, không cho đóng. Ngược lại, xác nhận lại việc đóng phòng, khi đóng user sẽ quay lại trang chính và xóa session.
+        closeRoomBtn.setOnClickListener(v -> {
+            if (thisRoom != null) {
+                if (thisRoom.totalParticipant > thisRoom.currentWait) {
+                    Snackbar.make(view, "Người chờ còn trong phòng, không thể đóng", Snackbar.LENGTH_SHORT).show();
+                } else {
+
+                    MaterialAlertDialogBuilder alert = new MaterialAlertDialogBuilder(mContext)
+                                                            .setTitle("Xác nhận đóng phòng")
+                                                            .setMessage("Bạn có muốn đóng phòng. Khi đóng phòng bạn không thể quay lại phòng nữa.")
+                            .setPositiveButton("Có", (dialog, which) -> {
+                                currentRoomRef.child(RoomDataEntry.ROOT_NAME).child(RoomDataEntry.IS_CLOSE_ARM).setValue(true)
+                                        .addOnSuccessListener(unused -> {
+                                            sessionManager.clearUserCurrentRoom();
+                                            mActivity.finish();
+                                        }).addOnFailureListener(e -> {
+                                    Toast.makeText(mContext, "Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                });
+                            }).setNeutralButton("Không", (dialog, which) -> {
+
+                            });
+                    alert.show();
+                }
+            }
+        });
+
         return view;
     }
 
@@ -112,9 +147,8 @@ public class HostRoomSettingFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        DatabaseReference currentRoom = roomEntryRequester.find(sessionManager.getCurrentRoomKey());
-
-        currentRoom.child(RoomDataEntry.ROOT_NAME).addValueEventListener(eventListener);
+        currentRoomRef = roomEntryRequester.find(sessionManager.getCurrentRoomKey());
+        currentRoomRef.child(RoomDataEntry.ROOT_NAME).addValueEventListener(eventListener);
     }
 
     private final ValueEventListener eventListener = new ValueEventListener() {
@@ -144,7 +178,7 @@ public class HostRoomSettingFragment extends Fragment {
 
         @Override
         public void onCancelled(@NonNull DatabaseError error) {
-            Snackbar.make(getView(), "Lỗi đường truyền không ổn định", Snackbar.LENGTH_INDEFINITE);
+            Snackbar.make(getView(), "Lỗi đường truyền không ổn định", Snackbar.LENGTH_LONG).show();
         }
     };
 
