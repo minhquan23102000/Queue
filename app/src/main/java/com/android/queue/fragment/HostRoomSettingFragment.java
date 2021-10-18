@@ -28,6 +28,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.slider.LabelFormatter;
 import com.google.android.material.slider.Slider;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
@@ -246,6 +247,10 @@ public class HostRoomSettingFragment extends Fragment {
                         .addOnFailureListener(e -> Toast.makeText(mContext, "Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show());
             }
         });
+
+        //Thêm formatter cho slider
+        timeWaitSlider.setLabelFormatter(value -> (int)value + " phút");
+        timeDelaySlider.setLabelFormatter(value -> value + " phút");
         return view;
     }
 
