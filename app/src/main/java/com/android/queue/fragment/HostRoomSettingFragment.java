@@ -33,10 +33,16 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
 import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract.RoomEntry.RoomDataEntry;
 import com.google.android.material.textview.MaterialTextView;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -98,7 +104,7 @@ public class HostRoomSettingFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view =  inflater.inflate(R.layout.fragment_host_room_setting, container, false);
+        View view = inflater.inflate(R.layout.fragment_host_room_setting, container, false);
 
         //Hook view
         timeStartTextView = view.findViewById(R.id.timeStartTv);
@@ -114,7 +120,8 @@ public class HostRoomSettingFragment extends Fragment {
         waitSettingTextView.setAdapter(adapter);
 
 
-        //Đóng phòng, nếu trong phòng còn người xếp hàng, không cho đóng. Ngược lại, xác nhận lại việc đóng phòng, khi đóng user sẽ quay lại trang chính và xóa session.
+        //Đóng phòng, nếu trong phòng còn người xếp hàng, không cho đóng. Ngược lại, xác nhận lại việc đóng phòng,
+        // khi đóng user sẽ quay lại trang chính và xóa session.
         closeRoomBtn.setOnClickListener(v -> {
             if (thisRoom != null) {
                 if (thisRoom.totalParticipant > thisRoom.currentWait) {
@@ -122,20 +129,69 @@ public class HostRoomSettingFragment extends Fragment {
                 } else {
 
                     MaterialAlertDialogBuilder alert = new MaterialAlertDialogBuilder(mContext)
-                                                            .setTitle("Xác nhận đóng phòng")
-                                                            .setMessage("Bạn có muốn đóng phòng. Khi đóng phòng bạn không thể quay lại phòng nữa.")
+                            .setTitle("Xác nhận đóng phòng")
+                            .setMessage("Bạn có muốn đóng phòng. Khi đóng phòng bạn không thể quay lại phòng nữa.")
                             .setPositiveButton("Có", (dialog, which) -> {
                                 currentRoomRef.child(RoomDataEntry.ROOT_NAME).child(RoomDataEntry.IS_CLOSE_ARM).setValue(true)
                                         .addOnSuccessListener(unused -> {
                                             sessionManager.clearUserCurrentRoom();
                                             mActivity.finish();
-                                        }).addOnFailureListener(e -> {
-                                    Toast.makeText(mContext, "Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                                });
+                                        }).addOnFailureListener(e -> Toast.makeText(mContext, "Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show());
                             }).setNeutralButton("Không", (dialog, which) -> {
 
                             });
                     alert.show();
+                }
+            }
+        });
+
+        //Tạm dừng phòng, khi phòng chờ tạm dừng sẽ không cho người xếp hàng tham gia nữa.
+        // Khi tạm chờ, chủ phòng phải nhập khoảng thời gian tạm chờ.
+        // Khi phòng chờ đang tạm dùng, button này sẽ hiện thị dưới dạng và có chức năng mở phòng chờ.
+        pauseRoomBtn.setOnClickListener(v -> {
+            if (thisRoom != null) {
+                //Nếu phòng chờ chưa bắt đầu, không thể tạm dừng
+                if (thisRoom.timeStart >= System.currentTimeMillis()) {
+                    Toast.makeText(mContext,
+                            "Phòng chờ chưa đến thời gian bắt đầu. Không thể tạm dừng", Toast.LENGTH_LONG).show();
+                } else {
+                    //Nếu phòng chờ đang pause. Sẽ có chức năng mở phòng chờ.
+                    if (thisRoom.isPause) {
+                        currentRoomRef.child(RoomDataEntry.ROOT_NAME).child(RoomDataEntry.IS_PAUSE_ARM).setValue(false)
+                                .addOnSuccessListener(unused -> {
+                                    Toast.makeText(mContext, "Mở phòng thành công", Toast.LENGTH_SHORT).show();
+                                    pauseRoomBtn.setText("Tạm dừng");
+                                }).addOnFailureListener(e -> Toast.makeText(mContext, "Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                    } else {
+                        //Bật đồng hồ để user chọn khoảng thời gian tạm dừng
+                        MaterialTimePicker picker = new MaterialTimePicker.Builder()
+                                .setTimeFormat(TimeFormat.CLOCK_24H)
+                                .setHour(1)
+                                .setMinute(10)
+                                .setTitleText("Tạm dừng trong vòng")
+                                .build();
+
+                        picker.show(getParentFragmentManager(), TAG);
+                        picker.addOnPositiveButtonClickListener(v1 -> {
+                            //Lấy giờ tạm dừng
+                            Timestamp timeStart = new Timestamp(System.currentTimeMillis() +
+                                    TimeUnit.MINUTES.toMillis(picker.getMinute()) + TimeUnit.HOURS.toMillis(picker.getHour()));
+                            //Update đồng bộ hai trường timeStart và isPause, chúng ta sẽ tạo một hashmap
+                            HashMap<String, Object> updateField = new HashMap<>();
+                            updateField.put(RoomDataEntry.IS_PAUSE_ARM, true);
+                            updateField.put(RoomDataEntry.TIME_START_ARM, timeStart.getTime());
+                            //Update lên firebase
+                            currentRoomRef.child(RoomDataEntry.ROOT_NAME).updateChildren(updateField)
+                                    .addOnSuccessListener(unused -> {
+                                        Toast.makeText(mContext, "Đã tạm dừng phòng thành công", Toast.LENGTH_SHORT).show();
+                                        pauseRoomBtn.setText("Tạm dừng");
+                                    }).addOnFailureListener(e -> Toast.makeText(mContext, "Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                        });
+                        picker.addOnCancelListener(dialog -> {
+
+                        });
+
+                    }
                 }
             }
         });
@@ -157,23 +213,24 @@ public class HostRoomSettingFragment extends Fragment {
 
             //Get data transferred from firebase with getValue method from dataSnapshot
             thisRoom = snapshot.getValue(RoomData.class);
-            Log.d(TAG, "onDataChange: "  + thisRoom.timeWait.floatValue() + thisRoom.maxParticipant);
 
             timeStartTextView.setText("Bắt đầu vào: " + TimestampHelper.toDatetime(thisRoom.timeStart));
 
             float timeWait = thisRoom.timeWait.floatValue();
             timeWaitSlider.setValue(timeWait);
-            timeWaitSlider.setValueFrom(timeWait - 60);
-            timeWaitSlider.setValueTo(timeWait + 60);
 
             float timeDelay = thisRoom.timeDelay.floatValue();
             timeDelaySlider.setValue(timeDelay);
-            timeDelaySlider.setValueFrom(timeDelay - 30);
-            timeDelaySlider.setValueTo(timeDelay+ 30.0f);
 
             maxParticipantTextInput.getEditText().setText(thisRoom.maxParticipant + "");
 
             waitSettingTextView.setText(WAIT_SETTING_VIEW_ITEM[getWaitIndex()], false);
+
+            if (thisRoom.isPause) {
+                pauseRoomBtn.setText("Mở phòng chờ");
+            } else {
+                pauseRoomBtn.setText("Tạm dừng");
+            }
         }
 
         @Override
@@ -192,10 +249,10 @@ public class HostRoomSettingFragment extends Fragment {
     }
 
     private int getWaitIndex() {
-       if (thisRoom.waitSetting.equals(RoomDataEntry.CONSTANT_WAIT)) {
-           return 0;
-       } else {
-           return 1;
-       }
+        if (thisRoom.waitSetting.equals(RoomDataEntry.CONSTANT_WAIT)) {
+            return 0;
+        } else {
+            return 1;
+        }
     }
 }
