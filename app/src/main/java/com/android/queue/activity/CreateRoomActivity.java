@@ -141,9 +141,6 @@ public class CreateRoomActivity extends AppCompatActivity {
             String hostPhone = phoneInputLayout.getEditText().getText().toString().trim();
             String address = addressInputLayout.getEditText().getText().toString().trim();
             LatLng roomLocation = sessionManager.getHostRoomLatLng();
-            Double timeWait = Double.parseDouble(timeWaitInputLayout.getEditText().getText().toString());
-            Double timeDelay = Double.parseDouble(timeDelayInputLayout.getEditText().getText().toString());
-            Long maxParticipant = Long.parseLong(maxParticipantInputLayout.getEditText().getText().toString());
             String waitSetting = getWaitSetting();
             Timestamp timeStart = new Timestamp(System.currentTimeMillis() +
                     TimeUnit.MINUTES.toMillis(minute) + TimeUnit.HOURS.toMillis(hour));
@@ -193,7 +190,12 @@ public class CreateRoomActivity extends AppCompatActivity {
                 timeStartInputLayout.setError("");
             }
 
+
+
             if (checkData) {
+                Double timeWait = Double.parseDouble(timeWaitInputLayout.getEditText().getText().toString());
+                Double timeDelay = Double.parseDouble(timeDelayInputLayout.getEditText().getText().toString());
+                Long maxParticipant = Long.parseLong(maxParticipantInputLayout.getEditText().getText().toString());
                 //Init room model
                 Room addingRoom = new Room(roomName, address, timeStart.getTime(), maxParticipant,
                         timeWait, timeDelay, waitSetting, roomLocation.latitude, roomLocation.longitude,
