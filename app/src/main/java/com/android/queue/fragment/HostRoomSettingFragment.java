@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.slider.Slider;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract.RoomEntry.RoomDataEntry;
 import com.google.android.material.textview.MaterialTextView;
@@ -193,6 +195,25 @@ public class HostRoomSettingFragment extends Fragment {
 
                     }
                 }
+            }
+        });
+
+        //Thêm key end event cho maxParticipant Input Edit Text, để khi user dừng nhập và ấn enter thì sẽ tự động update lên firebase
+        final TextInputEditText maxParticipantEditText = (TextInputEditText) maxParticipantTextInput.getEditText();
+        maxParticipantEditText.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    // Perform action on key press
+                    long maxParticipant = Long.parseLong(maxParticipantEditText.getText().toString());
+                    currentRoomRef.child(RoomDataEntry.ROOT_NAME)
+                            .child(RoomDataEntry.MAX_PARTICIPANT_ARM)
+                            .setValue(maxParticipant)
+                            .addOnFailureListener(e -> Toast.makeText(mContext, "Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                    return true;
+                }
+                return false;
             }
         });
 
