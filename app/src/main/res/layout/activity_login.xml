@@ -30,7 +30,9 @@
         android:layout_marginStart="24dp"
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="12dp"
-        android:hint="Số điện thoại">
+        android:hint="Số điện thoại"
+        app:counterMaxLength="10"
+        app:counterEnabled="true">
 
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"

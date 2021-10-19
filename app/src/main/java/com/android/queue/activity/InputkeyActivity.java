@@ -84,7 +84,6 @@ public class InputkeyActivity extends AppCompatActivity {
                                 Intent intent = new Intent(InputkeyActivity.this,LinedUpActivity.class);
                                 intent.putExtra("keyRoom",key);
                                 startActivity(intent);
-
                             }else{
                                 roomName.setText("Phòng không tồn tại");
                                 roomTotal.setText("");

@@ -34,7 +34,7 @@ public class RegisterActivity extends AppCompatActivity {
     private UserAccountsRequester userAccountsRequester;
 
 
-    public boolean validData = false ;
+    public static boolean validData = true ;
 
 
 
@@ -68,16 +68,20 @@ public class RegisterActivity extends AppCompatActivity {
     //Validate
     private TextWatcher textWatcher = new TextWatcher() {
 
+        boolean a = false;
+        boolean b = false;
+        boolean c = false;
+        boolean d = false;
         @Override
         public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
             if (phoneTv.getEditText().getText().toString().length()==0) {
                 phoneTv.setError("Số điện thoại không được để trống");
                 phoneTv.setEnabled(true);
-                validData = false;
+                a = false;
             }
             else if (!phoneTv.getEditText().getText().toString().matches("[0-9]+") || phoneTv.getEditText().getText().length() != 10) {
-                validData = false;
+                a = false;
                 phoneTv.setError("Số điện thoại không hợp lệ");
             }
             else{
@@ -86,10 +90,11 @@ public class RegisterActivity extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {
-                            validData = false;
+                            a = false;
                             phoneTv.setError("Số điện thoại đã được đăng kí");
                             phoneTv.requestFocus();
                         } else {
+                            a = true;
                             phoneTv.setError(null);
                         }
                     }
@@ -101,33 +106,38 @@ public class RegisterActivity extends AppCompatActivity {
             }
             if (nameTv.getEditText().getText().toString().matches("")) {
                 nameTv.setError("Họ tên không được để trống");
-                validData = false;
+                b = false;
             } else {
+                b = true;
                 nameTv.setError(null);
             }
             if (passwordTv.getEditText().getText().toString().matches("")){
                 passwordTv.setError("Mật khẩu không được để trống");
-                validData = false;
+                c = false;
             }
             else {
+                c = true;
+
                 passwordTv.setError(null);
             }
             if (passwordTv.getEditText().getText().length() < 6){
                 passwordTv.setError("Mật khẩu tối thiểu phải 6 kí tự");
-                validData = false;
+                c = false;
             }
             else {
+                c = true;
                 passwordTv.setError(null);
             }
             if (!re_passwordTv.getEditText().getText().toString().equals(passwordTv.getEditText().getText().toString())){
                 re_passwordTv.setError("Mật khẩu không trùng khớp");
-                validData = false;
+                d = false;
             }
             else {
+                d = true;
                 re_passwordTv.setError(null);
-                validData = true;
             }
-            if (validData){
+
+            if (a && b && c && d){
                 regBtn.setEnabled(true);
             }
             else {
@@ -174,6 +184,10 @@ public class RegisterActivity extends AppCompatActivity {
         intent.putExtra("pass",pass);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
+    }
+
+    void setEnable(boolean result){
+        validData = result;
     }
 
 

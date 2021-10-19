@@ -1,7 +1,6 @@
 package com.android.queue.activity;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -9,13 +8,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.queue.R;
+import com.android.queue.adapter.ParticipantAdapter;
 import com.android.queue.firebase.realtimedatabase.RoomEntryRequester;
 import com.android.queue.models.Participant;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,8 +27,8 @@ public class LinedUpActivity extends AppCompatActivity {
 
     private RoomEntryRequester roomEntryRequester;
     private DatabaseReference databaseReference;
-    private RecyclerView recyclerView;
-    private ParticipantAdapter mP_Adapter;
+    private static RecyclerView recyclerView;
+    private static ParticipantAdapter mP_Adapter;
     private List<Participant> listParticipant;
     private String key;
     @Override
@@ -68,6 +66,7 @@ public class LinedUpActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()){
+                    listParticipant.clear();
                     for(DataSnapshot dataSnapshot : snapshot.getChildren()){
                        //Participant mParticipant=dataSnapshot.getValue(Participant.class);
                         Participant mParticipant;
@@ -79,6 +78,7 @@ public class LinedUpActivity extends AppCompatActivity {
                         listParticipant.add(mParticipant);
                     }
                     mP_Adapter.notifyDataSetChanged();
+                    recyclerView.setAdapter(mP_Adapter);
                 }
 
             }
@@ -90,6 +90,4 @@ public class LinedUpActivity extends AppCompatActivity {
         });
 
     }
-
-
 }

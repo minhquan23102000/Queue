@@ -1,4 +1,4 @@
-package com.android.queue.activity;
+package com.android.queue.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
