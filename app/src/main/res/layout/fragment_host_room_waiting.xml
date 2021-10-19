@@ -10,13 +10,13 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.4"
+        android:layout_weight="0.5"
         android:background="@color/reply_white_50_alpha_060">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="50dp"
+            android:layout_marginStart="65dp"
             android:layout_marginTop="24dp"
             android:text="Số chờ hiện tại"
             android:textAppearance="@style/TextAppearance.Reply.Subtitle2" />
@@ -26,9 +26,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/waiterNameTv"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="14dp"
-            android:layout_marginEnd="80dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="23dp"
+            android:layout_toEndOf="@id/numberLayout"
             android:drawableStart="@drawable/outline_phone_24"
             android:drawablePadding="18dp"
             android:text="0183645789"
@@ -40,9 +40,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="60dp"
-            android:layout_marginEnd="64dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="78dp"
+            android:layout_toEndOf="@id/numberLayout"
             android:drawableStart="@drawable/outline_person_24"
             android:drawablePadding="8dp"
             android:text="Trần Đức Chính"
@@ -50,6 +50,7 @@
             android:textIsSelectable="true" />
 
         <RelativeLayout
+            android:id="@+id/numberLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="45dp"
@@ -75,7 +76,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_marginStart="56dp"
-            android:layout_marginBottom="42dp"
+            android:layout_marginBottom="19dp"
             android:text="Đã xử lý"
             app:icon="@drawable/outline_done_24" />
 
@@ -85,7 +86,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_marginStart="48dp"
-            android:layout_marginBottom="57dp"
+            android:layout_marginLeft="54dp"
+            android:layout_marginBottom="35dp"
             android:layout_toRightOf="@id/doneBtn"
             android:text="Bỏ qua lượt"
             android:textAppearance="@style/TextAppearance.Reply.Button" />
@@ -106,9 +108,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Người chờ tiếp theo"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
+                android:text="Người chờ tiếp theo"
                 android:textAppearance="@style/TextAppearance.Reply.Subtitle1" />
 
             <LinearLayout
@@ -149,6 +151,14 @@
 
             </LinearLayout>
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="4dp"
+                android:background="@color/reply_blue_600" />
 
             <ListView
                 android:id="@+id/statsRoomListView"
@@ -156,7 +166,7 @@
                 android:layout_height="match_parent"
                 android:layout_margin="8dp"
                 android:divider="@color/reply_blue_600"
-                android:dividerHeight="1dp"
+                android:dividerHeight="0.5dp"
                 android:minHeight="42dp" />
 
         </LinearLayout>

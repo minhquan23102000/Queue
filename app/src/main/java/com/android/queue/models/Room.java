@@ -25,5 +25,8 @@ public class Room {
         participantList = new ArrayList<>();
     }
 
-    public Room(){}
+    public Room(){
+        this.roomData = new RoomData();
+        this.participantList = new ArrayList<>();
+    }
 }
