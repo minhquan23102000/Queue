@@ -77,8 +77,9 @@ public class RoomEntryRequester {
     /**
      * Method to update a specific field data of a room
      * **/
-    public void update(String fieldName, Object data, DatabaseReference roomData) {
-        roomData.child(fieldName)
+    public void update(String fieldName, Object data, String roomKey) {
+        DatabaseReference thisRoom = find(roomKey);
+        thisRoom.child(RoomDataEntry.ROOT_NAME).child(fieldName)
                 .setValue(data)
                 .addOnFailureListener(e -> Toast.makeText(mContext, "Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show());
     }
