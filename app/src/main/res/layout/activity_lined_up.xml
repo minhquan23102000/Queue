@@ -17,14 +17,15 @@
         android:background="@color/reply_white_50_alpha_060">
 
         <TextView
+            android:id="@+id/rNameTv"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="50dp"
             android:layout_marginTop="30dp"
-            android:textAlignment="center"
             android:text="TÊN PHÒNG"
-            android:textStyle="bold"
-            android:textAppearance="@style/TextAppearance.Reply.Subtitle2" />
+            android:textAlignment="center"
+            android:textAppearance="@style/TextAppearance.Reply.Subtitle2"
+            android:textStyle="bold" />
 
 
         <com.google.android.material.textview.MaterialTextView
@@ -91,30 +92,58 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/oval" />
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="120dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="50dp"
+                android:text="Thời gian chờ dự kiến:"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.Reply.Headline6"
+                android:textSize="10dp" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/waiterNumberTv"
-                android:layout_width="wrap_content"
+                android:id="@+id/sisoTv"
+                android:layout_width="115dp"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="90dp"
+                android:text="SS: 5/10"
+                android:textAlignment="center"
+                android:textAppearance="@style/TextAppearance.Reply.Headline6"
+                android:textSize="13dp" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/time"
+                android:layout_width="100dp"
+                android:layout_height="30dp"
                 android:layout_centerInParent="true"
-                android:text="100"
-                android:textAppearance="@style/TextAppearance.Reply.Headline6" />
+                android:layout_marginHorizontal="@dimen/chip_icon_diameter"
+                android:layout_marginTop="40dp"
+                android:text="120 phút"
+
+                android:textAppearance="@style/TextAppearance.Reply.Headline6"
+                android:textColor="@color/reply_blue_800"
+                android:textSize="20dp" />
         </RelativeLayout>
 
 
     </RelativeLayout>
 </LinearLayout>
-<androidx.recyclerview.widget.RecyclerView
-    android:id="@+id/rcv_participant"
-    android:layout_width="match_parent"
-    android:layout_height="380dp"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcv_participant"
+        android:layout_width="match_parent"
+        android:layout_height="340dp" />
 
     <LinearLayout
+
         android:layout_width="wrap_content"
         android:layout_gravity="center"
         android:layout_height="match_parent"
         android:orientation="horizontal">
         <Button
+            android:layout_marginBottom="10dp"
             android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -122,10 +151,11 @@
             android:text="CHỨC NĂNG">
         </Button>
         <Button
+            android:layout_marginBottom="10dp"
             android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="CHỨC NĂNG">q
+            android:text="CHỨC NĂNG">
         </Button>
     </LinearLayout>
 

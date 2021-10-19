@@ -34,12 +34,13 @@ public class InputkeyActivity extends AppCompatActivity {
 
     private ImageButton scanBtn;
     private TextInputLayout txtKey;
-    private MaterialTextView roomName;
-    private MaterialTextView roomTotal;
+    private static MaterialTextView roomName;
+    private static MaterialTextView roomTotal;
     private Button btnJoin;
     private RoomEntryRequester roomEntryRequester;
     private DatabaseReference databaseReference;
     private SessionManager sessionManager;
+    private static RoomData thisRoom;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,10 +54,15 @@ public class InputkeyActivity extends AppCompatActivity {
 
         Intent intent=getIntent();
         String str = intent.getStringExtra("Key");
-
         txtKey.getEditText().setText(str);
 
+        if(str!=null){
+            roomEntryRequester = new RoomEntryRequester(InputkeyActivity.this);
+            databaseReference= roomEntryRequester.find(str);
+        }
         setWelcomeRoomName(str);
+
+
         sessionManager = new SessionManager(this);
 
 
@@ -73,17 +79,28 @@ public class InputkeyActivity extends AppCompatActivity {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             if(snapshot.exists()){
-                                //Add Partipant
-                                String waiterPhone=sessionManager.getUserData().getString(QueueDatabaseContract.UserEntry.PHONE_ARM);
-                                String waiterName=sessionManager.getUserData().getString(QueueDatabaseContract.UserEntry.FULL_NAME_ARM);
-                                String waiterState= "IsWait";
-                                Participant participant = new Participant(waiterPhone,waiterName,waiterState);
-                                RoomData thisRoom=snapshot.getValue(RoomData.class);
-                                roomEntryRequester.addParticipant(participant,key);
-                                //Chuyển qua activity xếp hàng
-                                Intent intent = new Intent(InputkeyActivity.this,LinedUpActivity.class);
-                                intent.putExtra("keyRoom",key);
-                                startActivity(intent);
+                                RoomData thisRoom = snapshot.getValue(RoomData.class);
+
+                                if (thisRoom.totalParticipant >= thisRoom.maxParticipant) {
+                                    setWelcomeRoomName(key);
+                                    Toast.makeText(InputkeyActivity.this, "Phòng chờ hiện tại đã bị đầy. Tổng số người trong phòng chờ là: "
+                                            + thisRoom.totalParticipant, Toast.LENGTH_LONG).show();
+                                } else if (thisRoom.isClose) {
+                                    Toast.makeText(InputkeyActivity.this, "Phòng chờ hiện đang bị đóng bởi chủ phòng", Toast.LENGTH_SHORT).show();
+                                } else if (thisRoom.isPause) {
+                                    Toast.makeText(InputkeyActivity.this, "Phòng chờ hiện đang bị tạm dừng bởi chủ phòng", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    //Add Partipant
+                                    String waiterPhone=sessionManager.getUserData().getString(QueueDatabaseContract.UserEntry.PHONE_ARM);
+                                    String waiterName=sessionManager.getUserData().getString(QueueDatabaseContract.UserEntry.FULL_NAME_ARM);
+                                    String waiterState= "IsWait";
+                                    Participant participant = new Participant(waiterPhone,waiterName,waiterState);
+                                    roomEntryRequester.addParticipant(participant,key);
+                                    //Chuyển qua activity xếp hàng
+                                    Intent intent = new Intent(InputkeyActivity.this,LinedUpActivity.class);
+                                    intent.putExtra("keyRoom",key);
+                                    startActivity(intent);
+                                }
                             }else{
                                 roomName.setText("Phòng không tồn tại");
                                 roomTotal.setText("");
@@ -107,19 +124,25 @@ public class InputkeyActivity extends AppCompatActivity {
         });
     }
 
+
     public void setWelcomeRoomName(String str){
         if(str!=null){
-            RoomEntryRequester tempRoom = new RoomEntryRequester(InputkeyActivity.this);
-            DatabaseReference tempData= tempRoom.find(str);
-            Query query = tempData.child("roomData");
+
+            Query query = databaseReference.child("roomData");
             query.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        thisRoom = null;
                         if(snapshot.exists()){
-                            RoomData thisRoom=snapshot.getValue(RoomData.class);
+                            //thisRoom=snapshot.getValue(RoomData.class);
+                            //roomName.setText("Welcome "+thisRoom.roomName);
+                            //roomTotal.setText(thisRoom.totalParticipant.toString()+"/"+thisRoom.maxParticipant.toString());
+                            String str1 = snapshot.child("roomName").getValue(String.class);
+                            Long long1 = snapshot.child("totalParticipant").getValue(Long.class);
+                            Long long2 = snapshot.child("maxParticipant").getValue(Long.class);
+                            roomName.setText("Welcome "+str1);
+                            roomTotal.setText(long1.toString()+"/"+long2.toString());
 
-                            roomName.setText("Welcome "+thisRoom.roomName);
-                            roomTotal.setText(thisRoom.totalParticipant.toString()+"/"+thisRoom.maxParticipant.toString());
                         }else{
                             roomName.setText("Phòng không tồn tại");
                             roomTotal.setText("");

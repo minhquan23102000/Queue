@@ -4,18 +4,23 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+
 import com.android.queue.models.Participant;
 import com.android.queue.models.Room;
 import com.android.queue.models.RoomData;
 import com.android.queue.utils.TimestampHelper;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract.RoomEntry;
 import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract.RoomEntry.RoomDataEntry;
 import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract.RoomEntry.ParticipantListEntry;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
+import com.google.firebase.database.ValueEventListener;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -98,7 +103,6 @@ public class RoomEntryRequester {
     public DatabaseReference find(String roomKey) {
         return mDatabase.child(RoomEntry.ROOT_NAME).child(roomKey);
     }
-
 
 
 
