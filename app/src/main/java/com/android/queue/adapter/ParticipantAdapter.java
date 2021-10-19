@@ -35,8 +35,8 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
         if(participant==null){
             return;
         }
-        holder.tv_Name.setText("Name: "+participant.getWaiterName());
-        holder.tv_Phone.setText("Phone: "+participant.getWaiterPhone());
+        holder.tv_Name.setText(participant.getWaiterName());
+        holder.sTT.setText("STT: "+participant.getWaiterNumber());
     }
 
     @Override
@@ -50,13 +50,15 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
     public class ParticipantViewHolder extends RecyclerView.ViewHolder {
 
         private TextView tv_Name;
-        private TextView tv_Phone;
+        private TextView sTT;
+        private TextView state;
 
 
         public ParticipantViewHolder(@NonNull View itemView) {
             super(itemView);
             tv_Name = itemView.findViewById(R.id.tv_name);
-            tv_Phone = itemView.findViewById(R.id.tv_phone);
+            sTT = itemView.findViewById(R.id.soTT);
+            state = itemView.findViewById(R.id.stateTv);
         }
     }
 }
