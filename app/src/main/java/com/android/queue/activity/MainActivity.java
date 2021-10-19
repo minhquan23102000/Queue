@@ -78,8 +78,8 @@ public class MainActivity extends AppCompatActivity {
         Bundle userData = sessionManager.getUserData();
         if (userData.getString(UserEntry.CURRENT_ROOM_ARM, null) != null) {
             if (userData.getBoolean(UserEntry.IS_HOST_ARM, false)) {
-//                Intent intent = new Intent(MainActivity.this, HostActivity.class);
-//                MainActivity.this.startActivity(intent);
+                Intent intent = new Intent(MainActivity.this, HostActivity.class);
+                MainActivity.this.startActivity(intent);
             }
         }
     }
