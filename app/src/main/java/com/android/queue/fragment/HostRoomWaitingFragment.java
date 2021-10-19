@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -18,6 +19,7 @@ import com.android.queue.R;
 import com.android.queue.SessionManager;
 import com.android.queue.adapter.StatsRoomAdapter;
 import com.android.queue.firebase.realtimedatabase.RoomEntryRequester;
+import com.android.queue.models.Participant;
 import com.android.queue.models.Room;
 import com.android.queue.models.RoomData;
 import com.android.queue.models.StatsRoomDataContract;
@@ -26,6 +28,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract.RoomEntry.RoomDataEntry;
 import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract.RoomEntry.ParticipantListEntry;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -68,7 +71,6 @@ public class HostRoomWaitingFragment extends Fragment {
 
     //Init data as a hashmap for room stats listview
     private HashMap<String, String> statsRoom;
-
     //Init adapter for list view
     private StatsRoomAdapter statsRoomAdapter;
 
@@ -90,6 +92,16 @@ public class HostRoomWaitingFragment extends Fragment {
         roomEntryRequester = new RoomEntryRequester(mContext);
         thisRoomReference = roomEntryRequester.find(sessionManager.getCurrentRoomKey());
         thisRoom = new Room();
+
+        //Init test data for this room
+//        Participant participant1 = new Participant("0123456789", "Tester1", 1L, ParticipantListEntry.STATE_IS_WAIT);
+//        Participant participant2 = new Participant("0123456788", "Tester2", 2L, ParticipantListEntry.STATE_IS_WAIT);
+//        Participant participant3 = new Participant("0123456787", "Tester3", 3L, ParticipantListEntry.STATE_IS_WAIT);
+//        Participant participant4 = new Participant("0123456786", "Tester4", 4L, ParticipantListEntry.STATE_IS_WAIT);
+//        roomEntryRequester.addParticipant(participant1, sessionManager.getCurrentRoomKey());
+//        roomEntryRequester.addParticipant(participant2, sessionManager.getCurrentRoomKey());
+//        roomEntryRequester.addParticipant(participant3, sessionManager.getCurrentRoomKey());
+//        roomEntryRequester.addParticipant(participant4, sessionManager.getCurrentRoomKey());
     }
 
     @Override
@@ -109,18 +121,31 @@ public class HostRoomWaitingFragment extends Fragment {
         viewListParticipantBtn = view.findViewById(R.id.viewListParticipantBtn);
         statsRoomListView = view.findViewById(R.id.statsRoomListView);
 
-        //Add roomData value listener to update view when the data is change in firebase
-        thisRoomReference.child(RoomDataEntry.ROOT_NAME).addValueEventListener(roomDataValueListener);
-
         //Create adapter and set to list view
         statsRoom = new HashMap<>();
         statsRoomAdapter = new StatsRoomAdapter(mContext, statsRoom);
         statsRoomListView.setAdapter(statsRoomAdapter);
 
+
+        //Add roomData value listener to update view when the data is change in firebase
+        thisRoomReference.child(RoomDataEntry.ROOT_NAME).addValueEventListener(roomDataValueListener);
+
+        //Add participant list children listener. Also query top two current waiter
+        //Add dummy data for prevent null pointer exception when async load
+        thisRoom.roomData.currentWait = 1L;
+        thisRoomReference
+                .child(ParticipantListEntry.ROOT_NAME)
+                .orderByChild(ParticipantListEntry.WAITER_NUMBER_ARM)
+                .startAt(thisRoom.roomData.currentWait)
+                .endAt(thisRoom.roomData.currentWait + 10)
+                .addValueEventListener(waiterListener);
+
         return view;
     }
 
 
+
+    //Value event listener to update room data
     private final ValueEventListener roomDataValueListener = new ValueEventListener() {
         @Override
         public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -133,6 +158,33 @@ public class HostRoomWaitingFragment extends Fragment {
             statsRoom.put(StatsRoomDataContract.TOTAL_LEFT, thisRoom.roomData.totalLeft + "");
             statsRoomAdapter.notifyDataSetChanged();
 
+            //Set current wait text view
+            waiterNumberTv.setText(String.valueOf(thisRoom.roomData.currentWait));
+
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError error) {
+
+        }
+    };
+
+    //even listener to update current participants.
+    private final ValueEventListener waiterListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull  DataSnapshot snapshot) {
+            thisRoom.participantList = new ArrayList<>();
+            for (DataSnapshot waiter: snapshot.getChildren()) {
+                thisRoom.participantList.add(waiter.getValue(Participant.class));
+            }
+
+            //Update current waiter into view
+            waiterNameTv.setText(thisRoom.participantList.get(0).waiterName);
+            waiterPhoneTv.setText(thisRoom.participantList.get(0).waiterPhone);
+
+            //Update next waiter
+            nextWaiterNameTv.setText(thisRoom.participantList.get(1).waiterName);
+            nextWaterPhoneTv.setText(thisRoom.participantList.get(1).waiterPhone);
         }
 
         @Override
