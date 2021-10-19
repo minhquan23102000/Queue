@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.InputFilter;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -18,6 +20,7 @@ import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract;
 import com.android.queue.firebase.realtimedatabase.RoomEntryRequester;
 import com.android.queue.firebase.storage.FirebaseStorageRequester;
 import com.android.queue.models.Room;
+import com.android.queue.utils.InputFilterMinMax;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -87,6 +90,12 @@ public class CreateRoomActivity extends AppCompatActivity {
         createRoomBtn = findViewById(R.id.createRoomBtn);
         backBtn = findViewById(R.id.backBtn);
 
+        //Add constraint min max for edit text timeWait and timeStart.
+        // 0 - 120 minutes for timeWait
+        timeWaitInputLayout.getEditText().setFilters(new InputFilter[] {new InputFilterMinMax(0, 120)});
+        //0 - 60 minutes for timeDelay
+        timeDelayInputLayout.getEditText().setFilters(new InputFilter[] {new InputFilterMinMax(0, 60)});
+
         //Bind data to phone text from user session
         phoneInputLayout.getEditText().setText(sessionManager.getUserData().getString(UserEntry.PHONE_ARM));
 
@@ -148,7 +157,7 @@ public class CreateRoomActivity extends AppCompatActivity {
             //Valid data in layout before insert to firebase
             boolean checkData = true;
             if (roomName.matches("")) {
-                roomNameInputLayout.setError("Tên không thể để trống");
+                roomNameInputLayout.setError("Tên phòng không thể để trống");
                  checkData = false;
             } else {
                 roomNameInputLayout.setError("");
@@ -160,31 +169,31 @@ public class CreateRoomActivity extends AppCompatActivity {
                 phoneInputLayout.setError("");
             }
             if (address.matches("")) {
-                addressInputLayout.setError("Địa chỉ không thể để trống");
+                addressInputLayout.setError("Địa chỉ phòng không thể để trống");
                 checkData = false;
             } else {
                 addressInputLayout.setError("");
             }
             if (checkNullEditText(timeDelayInputLayout.getEditText())) {
-                timeWaitInputLayout.setError("Thời gian chờ không thể để trống");
+                timeWaitInputLayout.setError("Cần nhập thời gian chờ");
                 checkData = false;
             } else {
                 timeWaitInputLayout.setError("");
             }
             if (checkNullEditText(timeDelayInputLayout.getEditText())) {
-                timeDelayInputLayout.setError("Độ trễ không thể bỏ trống");
+                timeDelayInputLayout.setError("Cần nhập độ trễ");
                 checkData = false;
             } else {
                 timeDelayInputLayout.setError("");
             }
             if (checkNullEditText(maxParticipantInputLayout.getEditText())) {
-                maxParticipantInputLayout.setError("Số lượng người tham gia không thể để trống");
+                maxParticipantInputLayout.setError("Yêu cầu nhập số lượng người tối đa");
                 checkData = false;
             } else {
                 maxParticipantInputLayout.setError("");
             }
             if (checkNullEditText(timeStartInputLayout.getEditText())) {
-                timeStartInputLayout.setError("Thời gian bắt đầu không thể để trống");
+                timeStartInputLayout.setError("Cần thiết lập thời gian bắt đầu");
                 checkData = false;
             } else {
                 timeStartInputLayout.setError("");
@@ -220,9 +229,16 @@ public class CreateRoomActivity extends AppCompatActivity {
                 }
             }
 
-
-
         });
+
+        //Set on click to clean error in text input layout
+        phoneInputLayout.setOnClickListener(clearError);
+        roomNameInputLayout.setOnClickListener(clearError);
+        addressInputLayout.setOnClickListener(clearError);
+        timeStartInputLayout.setOnClickListener(clearError);
+        timeDelayInputLayout.setOnClickListener(clearError);
+        timeWaitInputLayout.setOnClickListener(clearError);
+        maxParticipantInputLayout.setOnClickListener(clearError);
 
     }
 
@@ -246,4 +262,7 @@ public class CreateRoomActivity extends AppCompatActivity {
             return RoomDataEntry.CONSTANT_WAIT;
         }
     }
+
+
+    private final View.OnClickListener clearError = v -> ((TextInputLayout) v).setError("");
 }
