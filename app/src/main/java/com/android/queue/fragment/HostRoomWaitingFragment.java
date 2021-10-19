@@ -127,10 +127,6 @@ public class HostRoomWaitingFragment extends Fragment {
             thisRoom.roomData = snapshot.getValue(RoomData.class);
             //Put value into a hash map for the adapter of listview stats
             statsRoom.put(StatsRoomDataContract.TOTAL_PARTICIPANT, thisRoom.roomData.totalParticipant + "/" + thisRoom.roomData.maxParticipant);
-
-            long totalParticipantIn10Minutes = thisRoom.roomData.totalParticipant /
-                    TimestampHelper.getMinutes(TimestampHelper.TimestampDiff(thisRoom.roomData.timeStart, System.currentTimeMillis()))/10;
-            statsRoom.put(StatsRoomDataContract.TOTAL_PARTICIPANT_IN_10MIN, totalParticipantIn10Minutes + "");
             statsRoom.put(StatsRoomDataContract.TOTAL_WAIT, thisRoom.roomData.totalParticipant - thisRoom.roomData.currentWait + "");
             statsRoom.put(StatsRoomDataContract.TOTAL_DONE, thisRoom.roomData.totalDone + "");
             statsRoom.put(StatsRoomDataContract.TOTAL_SKIP, thisRoom.roomData.totalSkip + "");
