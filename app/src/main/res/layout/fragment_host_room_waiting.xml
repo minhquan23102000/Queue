@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -21,10 +22,10 @@
             android:textAppearance="@style/TextAppearance.Reply.Subtitle2" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/participantPhone"
+            android:id="@+id/waiterPhoneTv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/participantNameTv"
+            android:layout_below="@id/waiterNameTv"
             android:layout_alignParentEnd="true"
             android:layout_marginTop="14dp"
             android:layout_marginEnd="80dp"
@@ -35,7 +36,7 @@
             android:textIsSelectable="true" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/participantNameTv"
+            android:id="@+id/waiterNameTv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -60,7 +61,7 @@
                 android:src="@drawable/oval" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/participantNumber"
+                android:id="@+id/waiterNumberTv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
@@ -75,10 +76,11 @@
             android:layout_alignParentBottom="true"
             android:layout_marginStart="56dp"
             android:layout_marginBottom="42dp"
-            android:text="Đã xử lý" />
+            android:text="Đã xử lý"
+            app:icon="@drawable/outline_done_24" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/passBtn"
+            android:id="@+id/skipBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
@@ -95,14 +97,69 @@
         android:layout_height="0dp"
         android:layout_weight="0.6">
 
-        <ListView
-            android:id="@+id/statsRoomListView"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="8dp"
-            android:divider="@color/reply_orange_400"
-            android:headerDividersEnabled="true"
-            android:minHeight="40dp" />
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Người chờ tiếp theo"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:textAppearance="@style/TextAppearance.Reply.Subtitle1" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/nextWaiterNameTv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="@dimen/plane_08"
+                    android:text="Linh An"
+                    android:textAppearance="@style/TextAppearance.Reply.Body2"
+                    app:drawableStartCompat="@drawable/outline_person_24" />
+
+                <TextView
+                    android:id="@+id/nextWaiterPhoneTv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:drawablePadding="@dimen/plane_08"
+                    android:text="0386444597"
+                    android:textAppearance="@style/TextAppearance.Reply.Body2"
+                    app:drawableStartCompat="@drawable/outline_phone_24" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/viewListParticipantBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:text="Danh sách"
+                    android:textSize="14sp"
+                    app:icon="@drawable/outline_view_list_black_24" />
+
+
+            </LinearLayout>
+
+
+            <ListView
+                android:id="@+id/statsRoomListView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="8dp"
+                android:divider="@color/reply_blue_600"
+                android:dividerHeight="1dp"
+                android:minHeight="42dp" />
+
+        </LinearLayout>
 
 
     </androidx.cardview.widget.CardView>
