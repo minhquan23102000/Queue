@@ -5,12 +5,15 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
+import com.android.queue.activity.LinedUpActivity;
 import com.android.queue.models.Participant;
 import com.android.queue.models.Room;
 import com.android.queue.models.RoomData;
 import com.android.queue.utils.TimestampHelper;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -103,6 +106,44 @@ public class RoomEntryRequester {
     public DatabaseReference find(String roomKey) {
         return mDatabase.child(RoomEntry.ROOT_NAME).child(roomKey);
     }
+
+
+    //Đang test 2 hàm này
+    public void updateTotalParticipantafterChange(String roomKey,int total){
+        DatabaseReference room = find(roomKey);
+        room.child("roomData").child("totalParticipant").setValue(total-1);
+
+    }
+
+    public void updateWaiterNumberafterChange(String roomKey,String postKey, long totalParticipant){
+        DatabaseReference room = find(roomKey);
+        Query query = room.child("participantList");
+        query.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                for(DataSnapshot dataSnapshot: snapshot.getChildren())
+                {
+                    String str=dataSnapshot.getKey();
+                    long num=dataSnapshot.child("waiterNumber").getValue(long.class);
+                }
+            }
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+            }
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
+
+
+
 
 
 

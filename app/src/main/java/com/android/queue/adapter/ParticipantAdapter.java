@@ -35,14 +35,30 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
         if(participant==null){
             return;
         }
-        holder.tv_Name.setText(participant.getWaiterName());
-        holder.sTT.setText("STT: "+participant.getWaiterNumber());
+        if(participant.waiterNumber!=-1){
+            holder.tv_Name.setText(participant.getWaiterName());
+            holder.sTT.setText("STT: "+participant.getWaiterNumber());
+            holder.state.setText(participant.waiterState);
+        }
+
     }
 
     @Override
     public int getItemCount() {
-        if(mListParticipant!=null){
+        if (mListParticipant != null) {
             return mListParticipant.size();
+        }
+        return 0;
+    }
+
+    public int getIsWaiterCount(){
+        if(mListParticipant!=null){
+            int i=0;
+            for (Participant temp:mListParticipant) {
+                if(temp.waiterNumber!=-1)
+                    i++;
+            }
+            return i;
         }
         return 0;
     }

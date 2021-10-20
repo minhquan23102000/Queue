@@ -143,19 +143,21 @@
         android:layout_height="match_parent"
         android:orientation="horizontal">
         <Button
+            android:id="@+id/skipBtn"
             android:layout_marginBottom="10dp"
             android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="50dp"
-            android:text="CHỨC NĂNG">
+            android:text="Bỏ lượt">
         </Button>
         <Button
+            android:id="@+id/leaveBtn"
             android:layout_marginBottom="10dp"
             android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="CHỨC NĂNG">
+            android:text="Rời lượt">
         </Button>
     </LinearLayout>
 
