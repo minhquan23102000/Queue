@@ -19,6 +19,7 @@ import com.android.queue.adapter.ParticipantAdapter;
 import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract;
 import com.android.queue.firebase.realtimedatabase.RoomEntryRequester;
 import com.android.queue.models.Participant;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -27,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.function.Consumer;
 
 public class LinedUpActivity extends AppCompatActivity {
@@ -46,6 +48,7 @@ public class LinedUpActivity extends AppCompatActivity {
     private static ParticipantAdapter mP_Adapter;
     private List<Participant> listParticipant;
     private String key;
+    //private long[] numberList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,8 +101,6 @@ public class LinedUpActivity extends AppCompatActivity {
     }
 
     private void getListParticipant(){
-
-
         Query query = databaseReference.child("participantList");
         query.addValueEventListener(new ValueEventListener() {
             @Override
@@ -121,10 +122,9 @@ public class LinedUpActivity extends AppCompatActivity {
                     mP_Adapter.notifyDataSetChanged();
                     recyclerView.setAdapter(mP_Adapter);
                     getDataRoomFromFirebase();
+                    updateWaiterNumberafterChange(key);
                 }
-
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(LinedUpActivity.this, "Error", Toast.LENGTH_SHORT).show();
@@ -176,31 +176,23 @@ public class LinedUpActivity extends AppCompatActivity {
 
     private void leaveRoom(){
         String waiterPhone=sessionManager.getUserData().getString(QueueDatabaseContract.UserEntry.PHONE_ARM);
-        RoomEntryRequester tempRoomEntryRequeser=new RoomEntryRequester(LinedUpActivity.this);
-        DatabaseReference tempDatabaseRefernce=tempRoomEntryRequeser.find(key);
-        Query query = tempDatabaseRefernce.child("participantList");
-        query.addValueEventListener(new ValueEventListener() {
+        RoomEntryRequester tempRoom=new RoomEntryRequester(LinedUpActivity.this);
+        DatabaseReference tempDatabase=tempRoom.find(key);
+        Query query = tempDatabase.child("participantList");
+        query.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
-                    for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                       String waiterKey=dataSnapshot.getKey();
-                       String str=dataSnapshot.child("waiterPhone").getValue(String.class);
-                       if(str.equals(waiterPhone)){
-                           updateAfterLeave(waiterKey);
-                           tempRoomEntryRequeser.updateTotalParticipantafterChange(key,mP_Adapter.getItemCount());
-                           //long i=countTotalParticipant(key);
-                           //tempRoomEntryRequeser.updateWaiterNumberafterChange(key,i);
-                           //Intent intent=new Intent(LinedUpActivity.this,MainActivity.class);
-                           //startActivity(intent);
-                       }
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                        String waiterKey=snapshot.getKey();
+                        String str=snapshot.child("waiterPhone").getValue(String.class);
+                        if(str.equals(waiterPhone)){
+                            int i=mP_Adapter.getItemCount();
+                            updateAfterLeave(waiterKey);
+                            tempRoom.updateTotalParticipantafterChange(key);
+                        }
                     }
                 }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(LinedUpActivity.this, "Error", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -212,31 +204,26 @@ public class LinedUpActivity extends AppCompatActivity {
         tempDatabaseRefernce.child("participantList").child(waiterKey).child("waiterState").setValue(QueueDatabaseContract.RoomEntry.ParticipantListEntry.STATE_IS_LEFT);
     }
 
-    private void updateSTT(){
-        RoomEntryRequester tempRoomEntryRequeser=new RoomEntryRequester(LinedUpActivity.this);
-        DatabaseReference tempDatabaseRefernce=tempRoomEntryRequeser.find(key);
-        long i=countTotalParticipant(key);
-        //tempRoomEntryRequeser.updateWaiterNumberafterChange(key,i);
-    }
 
-    private long count;
-    private long countTotalParticipant(String roomKey){
+    public void updateWaiterNumberafterChange(String roomKey){
         RoomEntryRequester tempRoomEntryRequeser=new RoomEntryRequester(LinedUpActivity.this);
-        DatabaseReference tempDatabaseRefernce=tempRoomEntryRequeser.find(key);
-        Query query = tempDatabaseRefernce.child("roomData");
-        query.addValueEventListener(new ValueEventListener() {
+        DatabaseReference tempDatabaseRefernce=tempRoomEntryRequeser.find(roomKey);
+        Query query = tempDatabaseRefernce.child("participantList");
+        query.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
-                    count=snapshot.child("totalParticipant").getValue(long.class);
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                long num=1;
+                for(DataSnapshot snapshot:dataSnapshot.getChildren()){
+                    String waiterKey = snapshot.getKey();
+                    long ktr=snapshot.child("waiterNumber").getValue(long.class);
+                    if(ktr!=(-1)){
+                        tempDatabaseRefernce.child("participantList").child(waiterKey).child("waiterNumber").setValue(num);
+                        num++;
+                    }
                 }
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(LinedUpActivity.this, "Error", Toast.LENGTH_SHORT).show();
-            }
         });
-        return count;
     }
+
+
 }

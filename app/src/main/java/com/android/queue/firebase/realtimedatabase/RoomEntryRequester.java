@@ -108,39 +108,19 @@ public class RoomEntryRequester {
     }
 
 
-    //Đang test 2 hàm này
-    public void updateTotalParticipantafterChange(String roomKey,int total){
-        DatabaseReference room = find(roomKey);
-        room.child("roomData").child("totalParticipant").setValue(total-1);
-
-    }
-
-    public void updateWaiterNumberafterChange(String roomKey,String postKey, long totalParticipant){
-        DatabaseReference room = find(roomKey);
-        Query query = room.child("participantList");
-        query.addChildEventListener(new ChildEventListener() {
+    //Giảm totalParticipant xau khi rời phòng hoặc được xử lý
+    public void updateTotalParticipantafterChange(String roomKey){
+        DatabaseReference room = mDatabase.child(RoomEntry.ROOT_NAME).child(roomKey);
+        room.child(RoomDataEntry.ROOT_NAME).get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
             @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-            }
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                for(DataSnapshot dataSnapshot: snapshot.getChildren())
-                {
-                    String str=dataSnapshot.getKey();
-                    long num=dataSnapshot.child("waiterNumber").getValue(long.class);
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                RoomData thisRoom = dataSnapshot.getValue(RoomData.class);
+                room.child(RoomEntry.ROOM_DATA_ARM).child(RoomDataEntry.TOTAL_PARTICIPANT_ARM).setValue(thisRoom.totalParticipant - 1);
                 }
-            }
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-            }
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
         });
     }
+
+
 
 
 
