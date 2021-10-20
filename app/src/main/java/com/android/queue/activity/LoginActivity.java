@@ -5,7 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.queue.R;
@@ -31,7 +34,7 @@ import com.google.firebase.database.ValueEventListener;
 public class LoginActivity extends AppCompatActivity {
 
     private MaterialButton loginBtn;
-    private MaterialButton regBtn;
+    private TextView regTv;
     TextInputLayout phoneTv;
     TextInputLayout passwordTv;
     String string_Pattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
@@ -47,7 +50,10 @@ public class LoginActivity extends AppCompatActivity {
         phoneTv = findViewById(R.id.phoneTv);
         passwordTv = findViewById(R.id.passwordTv);
         loginBtn = findViewById(R.id.loginBtn);
-        regBtn = findViewById(R.id.regBtn);
+        regTv = findViewById(R.id.regTv);
+
+        phoneTv.getEditText().addTextChangedListener(textWatcher);
+        passwordTv.getEditText().addTextChangedListener(textWatcher);
 
         userAccountsRequester = new UserAccountsRequester(this);
         sessionManager = new SessionManager(this);
@@ -59,33 +65,52 @@ public class LoginActivity extends AppCompatActivity {
                 onClickLogin();
             }
         });
-        regBtn.setOnClickListener(new View.OnClickListener() {
+        regTv.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
                 LoginActivity.this.startActivity(intent);
             }
         });
-//        loginPhone.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent = new Intent(LoginActivity.this, VerifyPhoneNumber.class);
-//                LoginActivity.this.startActivity(intent);
-//            }
-//        });
-
-
-        //Test thêm người chờ vào một phòng
-//        RoomEntryRequester roomEntryRequester = new RoomEntryRequester(this);
-//        Participant participant = new Participant("0123458698", "Tester8",  ParticipantListEntry.STATE_IS_WAIT);
-//        roomEntryRequester.addParticipant(participant, "-MlwbMJc0itEekqKtOtT");
     }
+
+    //Validate
+    private TextWatcher textWatcher = new TextWatcher() {
+        @Override
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            if(phoneTv.getEditText().getText().length() ==0){
+                phoneTv.setError("Số điện thoại không được để trống");
+            }
+            else if (!phoneTv.getEditText().getText().toString().matches("[0-9]+") || phoneTv.getEditText().getText().length() != 10){
+                phoneTv.setError("Số điện thoại không hợp lệ");
+            }
+            else {
+                phoneTv.setError(null);
+            }
+            if(passwordTv.getEditText().getText().length() ==0){
+                passwordTv.setError("Mật khẩu không được để trống");
+            }
+            else {
+                passwordTv.setError(null);
+            }
+        }
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+
+        }
+    };
 
 
     private void onClickLogin(){
         String phone = phoneTv.getEditText().getText().toString();
         String pass = passwordTv.getEditText().getText().toString();
         String encrypts = MD5Encode.endCode(pass);
+
         DatabaseReference databaseReference = userAccountsRequester.getmDatabase();
         Query query = databaseReference.orderByChild("phone").equalTo(phone.trim());
         query.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -100,11 +125,13 @@ public class LoginActivity extends AppCompatActivity {
                             sessionManager.isLogin();
                             sendUserToHome();
                         } else {
-                            Toast.makeText(LoginActivity.this, "Sai mật khẩu", Toast.LENGTH_LONG).show();
+                            passwordTv.setError("Sai mật khẩu");
+                            passwordTv.requestFocus();
                         }
                     }
                 } else {
-                    Toast.makeText(LoginActivity.this, "Tài khoản không tồn tại", Toast.LENGTH_LONG).show();
+                    phoneTv.setError("Tài khoản không tồn tại");
+                    phoneTv.requestFocus();
                 }
             }
 
@@ -113,6 +140,7 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
+
 
     }
 

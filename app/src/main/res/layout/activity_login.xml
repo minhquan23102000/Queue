@@ -60,11 +60,24 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="370dp"
+        android:layout_marginTop="400dp"
         android:gravity="center"
-        android:orientation="horizontal">
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/forgotPassTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="24dp"
+            android:text="Quên mật khẩu?"
+            android:textColor="@color/purple_700"
+            android:textSize="15dp" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/loginBtn"
+            android:layout_marginStart="24dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/passwordTv"
@@ -72,17 +85,23 @@
             android:layout_marginTop="14dp"
             android:layout_marginEnd="18dp"
             android:text="Đăng nhập" />
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/regBtn"
+
+        <TextView
+            android:id="@+id/regTv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/passwordTv"
-            android:layout_alignParentEnd="true"
-            android:layout_marginTop="14dp"
-            android:layout_marginEnd="18dp"
-            android:text="Đăng ký" />
-
-
+            android:layout_marginTop="15dp"
+            android:text="Bạn chưa có tài khoản? Đăng kí ngay"
+            android:textSize="15dp"></TextView>
+        <!--        <com.google.android.material.button.MaterialButton-->
+        <!--            android:id="@+id/regBtn"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:layout_below="@+id/passwordTv"-->
+        <!--            android:layout_alignParentEnd="true"-->
+        <!--            android:layout_marginTop="14dp"-->
+        <!--            android:layout_marginEnd="18dp"-->
+        <!--            android:text="Đăng ký" />-->
     </LinearLayout>
 
 <!--    <com.google.android.material.button.MaterialButton
