@@ -110,23 +110,29 @@ public class LoginActivity extends AppCompatActivity {
         String phone = phoneTv.getEditText().getText().toString();
         String pass = passwordTv.getEditText().getText().toString();
         String encrypts = MD5Encode.endCode(pass);
+//        userAccountsRequester.isLogin(phone);
 
         DatabaseReference databaseReference = userAccountsRequester.getmDatabase();
-        Query query = databaseReference.orderByChild("phone").equalTo(phone.trim());
+        Query query = databaseReference.orderByChild(QueueDatabaseContract.UserEntry.PHONE_ARM).equalTo(phone.trim());
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot user : dataSnapshot.getChildren()) {
                         UserAccounts userAccounts = user.getValue(UserAccounts.class);
-                        if (userAccounts.password.equals(encrypts)) {
-                            Toast.makeText(LoginActivity.this, " Đăng nhập thành công", Toast.LENGTH_LONG).show();
-                            sessionManager.initUserSession(phone,userAccounts.fullName);
-                            sessionManager.isLogin();
-                            sendUserToHome();
-                        } else {
-                            passwordTv.setError("Sai mật khẩu");
-                            passwordTv.requestFocus();
+                        if (userAccounts.getLogin() == true){
+                            Toast.makeText(LoginActivity.this,"Tài khoản đã được đăng nhập trên một thiết bị khác", Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            if (userAccounts.password.equals(encrypts)) {
+                                userAccountsRequester.isLogin(phone,true);
+                                Toast.makeText(LoginActivity.this, " Đăng nhập thành công", Toast.LENGTH_LONG).show();
+                                sessionManager.initUserSession(userAccounts);
+                                sendUserToHome();
+                            } else {
+                                passwordTv.setError("Sai mật khẩu");
+                                passwordTv.requestFocus();
+                            }
                         }
                     }
                 } else {

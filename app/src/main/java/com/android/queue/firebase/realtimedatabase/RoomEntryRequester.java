@@ -75,7 +75,7 @@ public class RoomEntryRequester {
                 } else {
                     participant.waiterNumber = thisRoom.totalParticipant + 1;
                     room.child(RoomEntry.PARTICIPANT_LIST_ARM).push().setValue(participant);
-                    room.child(RoomEntry.ROOM_DATA_ARM).child(RoomDataEntry.TOTAL_PARTICIPANT_ARM).setValue(thisRoom.totalParticipant + 1);
+                    room.child(RoomEntry.ROOM_DATA_ARM).child(RoomDataEntry.TOTAL_PARTICIPANT_ARM).setValue(ServerValue.increment(1));
                 }
             }
         });

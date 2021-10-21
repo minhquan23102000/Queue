@@ -12,7 +12,7 @@ public class RoomData {
     public String waitSetting;
     public Double latitude;
     public Double longitude;
-    public Long currentWait = 0L;
+    public Long currentWait = 1L;
     public String hostPhone;
     public Long totalLeft = 0L;
     public Long totalSkip = 0L;

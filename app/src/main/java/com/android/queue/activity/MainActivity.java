@@ -8,6 +8,7 @@ import android.view.View;
 
 import com.android.queue.R;
 import com.android.queue.SessionManager;
+import com.android.queue.firebase.realtimedatabase.UserAccountsRequester;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract.UserEntry;
@@ -21,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     private MaterialButton lineBtn;
 
+    UserAccountsRequester userAccountsRequester;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
         //Init session manager
         sessionManager = new SessionManager(this);
 
+        userAccountsRequester = new UserAccountsRequester(this);
         if (sessionManager.isLogin()){
             //Init all view in this activity
             usernameTv = findViewById(R.id.usernameTv);
@@ -40,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
             logoutBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    userAccountsRequester.isLogin(sessionManager.getUserData().getString(UserEntry.PHONE_ARM),false);
                     sessionManager.clearUserData();
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     MainActivity.this.startActivity(intent);

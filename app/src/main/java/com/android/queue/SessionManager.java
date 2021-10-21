@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract.UserEntry;
+import com.android.queue.models.UserAccounts;
 import com.google.android.gms.maps.model.LatLng;
 
 public class SessionManager {
@@ -28,6 +29,16 @@ public class SessionManager {
         userDataEditor.commit();
     }
 
+    //test init User
+    public void initUserSession(UserAccounts userAccounts) {
+        userAccounts.setLogin(true);
+        userDataEditor.putString(UserEntry.PHONE_ARM, userAccounts.phone);
+        userDataEditor.putString(UserEntry.FULL_NAME_ARM, userAccounts.fullName);
+        userDataEditor.putString(UserEntry.IS_LOGIN_ARM, userAccounts.getLogin().toString());
+        userDataEditor.commit();
+    }
+
+
     public void putUserCurrentRoomId(String currentRoomId, boolean isHost) {
         userDataEditor.putString(UserEntry.CURRENT_ROOM_ARM, currentRoomId);
         userDataEditor.putBoolean(UserEntry.IS_HOST_ARM, isHost);
@@ -40,8 +51,9 @@ public class SessionManager {
 
 
     public boolean isLogin() {
-        String phone = userSession.getString(UserEntry.PHONE_ARM, null);
-        return phone != null;
+        String login = userSession.getString(UserEntry.IS_LOGIN_ARM, null);
+        boolean log = Boolean.parseBoolean(login);
+        return log;
     }
 
     public Bundle getUserData() {
@@ -88,6 +100,7 @@ public class SessionManager {
     }
 
     public void clearUserData() {
+
         userDataEditor.clear();
         userDataEditor.commit();
     }
