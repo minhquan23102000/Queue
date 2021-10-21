@@ -38,6 +38,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -103,19 +104,15 @@ public class HostRoomWaitingFragment extends Fragment {
 //        Participant participant2 = new Participant("0123456788", "Tester2", 2L, ParticipantListEntry.STATE_IS_WAIT);
 //        Participant participant3 = new Participant("0123456787", "Tester3", 3L, ParticipantListEntry.STATE_IS_WAIT);
 //        Participant participant4 = new Participant("0123456786", "Tester4", 4L, ParticipantListEntry.STATE_IS_WAIT);
-//        roomEntryRequester.addParticipant(participant1, sessionManager.getCurrentRoomKey());
-//        roomEntryRequester.addParticipant(participant2, sessionManager.getCurrentRoomKey());
-//        roomEntryRequester.addParticipant(participant3, sessionManager.getCurrentRoomKey());
-//        roomEntryRequester.addParticipant(participant4, sessionManager.getCurrentRoomKey());
-
 //        Participant participant5 = new Participant("0123456789", "Tester5", 5L, ParticipantListEntry.STATE_IS_WAIT);
 //        Participant participant6 = new Participant("0123456788", "Tester6", 6L, ParticipantListEntry.STATE_IS_WAIT);
 //        Participant participant7 = new Participant("0123456787", "Tester7", 7L, ParticipantListEntry.STATE_IS_WAIT);
 //        Participant participant8 = new Participant("0123456786", "Tester8", 8L, ParticipantListEntry.STATE_IS_WAIT);
-//        roomEntryRequester.addParticipant(participant5, sessionManager.getCurrentRoomKey());
-//        roomEntryRequester.addParticipant(participant6, sessionManager.getCurrentRoomKey());
-//        roomEntryRequester.addParticipant(participant7, sessionManager.getCurrentRoomKey());
-//        roomEntryRequester.addParticipant(participant8, sessionManager.getCurrentRoomKey());
+//        ArrayList<Participant> testData = new ArrayList<>();
+//        testData.add(participant1); testData.add(participant2); testData.add(participant3); testData.add(participant4);
+//        testData.add(participant5); testData.add(participant6); testData.add(participant7); testData.add(participant8);
+//        thisRoomReference.child(ParticipantListEntry.ROOT_NAME).setValue(testData);
+//        thisRoomReference.child(RoomDataEntry.ROOT_NAME).child(RoomDataEntry.TOTAL_PARTICIPANT_ARM).setValue(8);
     }
 
     @Override
@@ -167,6 +164,9 @@ public class HostRoomWaitingFragment extends Fragment {
                             .addOnFailureListener(e -> Toast.makeText(mContext, "Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show());
                 } else {
                     Toast.makeText(mContext, "Đã hết người chờ trong phòng", Toast.LENGTH_SHORT).show();
+                    waiterNumberTv.setText("hết");
+                    waiterPhoneTv.setText("");
+                    waiterNameTv.setText("");
                 }
 
             }
@@ -205,20 +205,25 @@ public class HostRoomWaitingFragment extends Fragment {
             thisRoom.roomData = snapshot.getValue(RoomData.class);
             //Put value into a hash map for the adapter of listview stats
             statsRoom.put(StatsRoomDataContract.TOTAL_PARTICIPANT, thisRoom.roomData.totalParticipant + "/" + thisRoom.roomData.maxParticipant);
-            statsRoom.put(StatsRoomDataContract.TOTAL_WAIT, thisRoom.roomData.totalParticipant - thisRoom.roomData.currentWait + "");
+            statsRoom.put(StatsRoomDataContract.TOTAL_WAIT, thisRoom.roomData.totalParticipant - thisRoom.roomData.currentWait + 1 + "");
             statsRoom.put(StatsRoomDataContract.TOTAL_DONE, thisRoom.roomData.totalDone + "");
             statsRoom.put(StatsRoomDataContract.TOTAL_SKIP, thisRoom.roomData.totalSkip + "");
             statsRoom.put(StatsRoomDataContract.TOTAL_LEFT, thisRoom.roomData.totalLeft + "");
             statsRoomAdapter.notifyDataSetChanged();
 
             //Set current wait text view
-            waiterNumberTv.setText(String.valueOf(thisRoom.roomData.currentWait));
+            if (thisRoom.roomData.totalParticipant > 0) {
+                waiterNumberTv.setText(String.valueOf(thisRoom.roomData.currentWait));
+            } else {
+                waiterNumberTv.setText("0");
+                Toast.makeText(mContext, "Phòng chờ hiện đang trống", Toast.LENGTH_LONG).show();
+            }
 
         }
 
         @Override
         public void onCancelled(@NonNull DatabaseError error) {
-
+            Toast.makeText(mContext, "Lỗi: " + error.getDetails(), Toast.LENGTH_LONG).show();
         }
     };
 
@@ -260,7 +265,7 @@ public class HostRoomWaitingFragment extends Fragment {
 
         @Override
         public void onCancelled(@NonNull DatabaseError error) {
-
+            Toast.makeText(mContext, "Lỗi: " + error.getDetails(), Toast.LENGTH_LONG).show();
         }
     };
 

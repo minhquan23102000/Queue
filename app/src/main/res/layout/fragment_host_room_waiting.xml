@@ -31,7 +31,7 @@
             android:layout_toEndOf="@id/numberLayout"
             android:drawableStart="@drawable/outline_phone_24"
             android:drawablePadding="18dp"
-            android:text="0183645789"
+            android:text=""
             android:textAppearance="@style/TextAppearance.Reply.Body1"
             android:textIsSelectable="true" />
 
@@ -45,7 +45,7 @@
             android:layout_toEndOf="@id/numberLayout"
             android:drawableStart="@drawable/outline_person_24"
             android:drawablePadding="8dp"
-            android:text="Trần Đức Chính"
+            android:text=""
             android:textAppearance="@style/TextAppearance.Reply.Body1"
             android:textIsSelectable="true" />
 
@@ -125,7 +125,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:drawablePadding="@dimen/plane_08"
+                    android:drawablePadding="4dp"
                     android:text=""
                     android:textAppearance="@style/TextAppearance.Reply.Body2"
                     app:drawableStartCompat="@drawable/outline_person_24" />
@@ -135,8 +135,8 @@
                     android:layout_width="0dp"
                     android:layout_weight="1.1"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
-                    android:drawablePadding="@dimen/plane_08"
+                    android:layout_marginStart="8dp"
+                    android:drawablePadding="4dp"
                     android:text=""
                     android:textAppearance="@style/TextAppearance.Reply.Body2"
                     app:drawableStartCompat="@drawable/outline_phone_24" />
@@ -146,7 +146,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="24dp"
+                    android:layout_marginStart="8dp"
                     android:text="Danh sách"
                     android:textSize="14sp"
                     app:icon="@drawable/outline_view_list_black_24" />

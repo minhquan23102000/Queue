@@ -44,7 +44,7 @@ public class RoomEntryRequester {
     //Tạo một phòng chờ
     public String createARoom(Room room) {
         //Init a row in firebase realtime, get its id.
-        String roomKey =  mDatabase.child(RoomEntry.ROOT_NAME).push().getKey();
+        String roomKey = mDatabase.child(RoomEntry.ROOT_NAME).push().getKey();
         if (roomKey != null) {
             //Add object to the new row that we have created.
             mDatabase.child(RoomEntry.ROOT_NAME).child(roomKey).setValue(room);
@@ -57,13 +57,11 @@ public class RoomEntryRequester {
     //Thêm một người xếp hàng vào trong list xếp hàng
     public void addParticipant(Participant participant, String roomKey) {
         DatabaseReference room = mDatabase.child(RoomEntry.ROOT_NAME).child(roomKey);
-        room.child(RoomDataEntry.ROOT_NAME).get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+        room.child(RoomDataEntry.ROOT_NAME).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onSuccess(DataSnapshot dataSnapshot) {
-
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
                 //Get data transferred from firebase with getValue method from dataSnapshot
-                RoomData thisRoom = dataSnapshot.getValue(RoomData.class);
-
+                RoomData thisRoom = snapshot.getValue(RoomData.class);
                 //If thisRoom is not closed and paused by the host and not full. We add user to this room. Else we show message that this room's state.
                 if (thisRoom.totalParticipant >= thisRoom.maxParticipant) {
                     Toast.makeText(mContext, "Phòng chờ hiện tại đã bị đầy. Tổng số người trong phòng chờ là: "
@@ -78,13 +76,16 @@ public class RoomEntryRequester {
                     room.child(RoomEntry.ROOM_DATA_ARM).child(RoomDataEntry.TOTAL_PARTICIPANT_ARM).setValue(ServerValue.increment(1));
                 }
             }
+            @Override
+            public void onCancelled(@NonNull  DatabaseError error) {
+                Toast.makeText(mContext, "Lỗi: " + error.getDetails(), Toast.LENGTH_LONG).show();
+            }
         });
-
     }
 
     /**
      * Method to update a specific field data of a room
-     * **/
+     **/
     public void update(String fieldName, Object data, String roomKey) {
         DatabaseReference thisRoom = find(roomKey);
         thisRoom.child(RoomDataEntry.ROOT_NAME).child(fieldName)
@@ -94,7 +95,7 @@ public class RoomEntryRequester {
 
     /**
      * Method to update qr file name of a room
-     * **/
+     **/
     public void updateQrFileName(String fileName, String roomKey) {
         DatabaseReference room = find(roomKey);
         room.child(RoomDataEntry.ROOT_NAME).child(RoomDataEntry.QR_ARM).setValue(fileName);
@@ -102,29 +103,23 @@ public class RoomEntryRequester {
 
     /**
      * Function to find a room, return its DatabaseReference
-     * **/
+     **/
     public DatabaseReference find(String roomKey) {
         return mDatabase.child(RoomEntry.ROOT_NAME).child(roomKey);
     }
 
 
     //Giảm totalParticipant xau khi rời phòng hoặc được xử lý
-    public void updateTotalParticipantafterChange(String roomKey){
+    public void updateTotalParticipantafterChange(String roomKey) {
         DatabaseReference room = mDatabase.child(RoomEntry.ROOT_NAME).child(roomKey);
         room.child(RoomDataEntry.ROOT_NAME).get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
             @Override
             public void onSuccess(DataSnapshot dataSnapshot) {
                 RoomData thisRoom = dataSnapshot.getValue(RoomData.class);
                 room.child(RoomEntry.ROOM_DATA_ARM).child(RoomDataEntry.TOTAL_PARTICIPANT_ARM).setValue(thisRoom.totalParticipant - 1);
-                }
+            }
         });
     }
-
-
-
-
-
-
 
 
     //Tạo test data, chạy một lần thôi, đừng chạy nữa nha, chạy nữa không sao nhưng nó ra hai cái. Nhờ lên firebase xem data mình tạo sẵn nha, là chạy cái  này đấy.
