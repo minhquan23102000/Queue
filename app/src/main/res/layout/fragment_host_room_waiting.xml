@@ -26,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/waiterNameTv"
-            android:layout_marginStart="32dp"
+            android:layout_marginStart="24dp"
             android:layout_marginTop="23dp"
             android:layout_toEndOf="@id/numberLayout"
             android:drawableStart="@drawable/outline_phone_24"
@@ -122,26 +122,29 @@
 
                 <TextView
                     android:id="@+id/nextWaiterNameTv"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:drawablePadding="@dimen/plane_08"
-                    android:text="Linh An"
+                    android:text=""
                     android:textAppearance="@style/TextAppearance.Reply.Body2"
                     app:drawableStartCompat="@drawable/outline_person_24" />
 
                 <TextView
                     android:id="@+id/nextWaiterPhoneTv"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1.1"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"
                     android:drawablePadding="@dimen/plane_08"
-                    android:text="0386444597"
+                    android:text=""
                     android:textAppearance="@style/TextAppearance.Reply.Body2"
                     app:drawableStartCompat="@drawable/outline_phone_24" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/viewListParticipantBtn"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"
                     android:text="Danh sách"

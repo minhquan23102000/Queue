@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.queue.R;
 import com.android.queue.SessionManager;
@@ -24,6 +25,7 @@ import com.android.queue.models.Room;
 import com.android.queue.models.RoomData;
 import com.android.queue.models.StatsRoomDataContract;
 import com.android.queue.utils.TimestampHelper;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
 import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract.RoomEntry.RoomDataEntry;
@@ -74,6 +76,9 @@ public class HostRoomWaitingFragment extends Fragment {
     //Init adapter for list view
     private StatsRoomAdapter statsRoomAdapter;
 
+    //Init current waiter Id
+    private String currentWaiterId;
+
     public static HostRoomWaitingFragment newInstance() {
         HostRoomWaitingFragment fragment = new HostRoomWaitingFragment();
         Bundle args = new Bundle();
@@ -102,6 +107,15 @@ public class HostRoomWaitingFragment extends Fragment {
 //        roomEntryRequester.addParticipant(participant2, sessionManager.getCurrentRoomKey());
 //        roomEntryRequester.addParticipant(participant3, sessionManager.getCurrentRoomKey());
 //        roomEntryRequester.addParticipant(participant4, sessionManager.getCurrentRoomKey());
+
+//        Participant participant5 = new Participant("0123456789", "Tester5", 5L, ParticipantListEntry.STATE_IS_WAIT);
+//        Participant participant6 = new Participant("0123456788", "Tester6", 6L, ParticipantListEntry.STATE_IS_WAIT);
+//        Participant participant7 = new Participant("0123456787", "Tester7", 7L, ParticipantListEntry.STATE_IS_WAIT);
+//        Participant participant8 = new Participant("0123456786", "Tester8", 8L, ParticipantListEntry.STATE_IS_WAIT);
+//        roomEntryRequester.addParticipant(participant5, sessionManager.getCurrentRoomKey());
+//        roomEntryRequester.addParticipant(participant6, sessionManager.getCurrentRoomKey());
+//        roomEntryRequester.addParticipant(participant7, sessionManager.getCurrentRoomKey());
+//        roomEntryRequester.addParticipant(participant8, sessionManager.getCurrentRoomKey());
     }
 
     @Override
@@ -131,14 +145,53 @@ public class HostRoomWaitingFragment extends Fragment {
         thisRoomReference.child(RoomDataEntry.ROOT_NAME).addValueEventListener(roomDataValueListener);
 
         //Add participant list children listener. Also query top two current waiter
-        //Add dummy data for prevent null pointer exception when async load
-        thisRoom.roomData.currentWait = 1L;
         thisRoomReference
                 .child(ParticipantListEntry.ROOT_NAME)
                 .orderByChild(ParticipantListEntry.WAITER_NUMBER_ARM)
-                .startAt(thisRoom.roomData.currentWait)
-                .endAt(thisRoom.roomData.currentWait + 10)
                 .addValueEventListener(waiterListener);
+
+        //doneBtn on click, update current waiter to state isDone, and increase currentNumber Wait to 1;
+        doneBtn.setOnClickListener(v -> {
+            //Make sure that this room date was loaded from firebase
+            if (currentWaiterId != null) {
+                if (thisRoom.roomData.currentWait < thisRoom.roomData.totalParticipant) {
+                    //Update current wait to 1
+                    roomEntryRequester.update(RoomDataEntry.CURRENT_WAIT_ARM, thisRoom.roomData.currentWait + 1, sessionManager.getCurrentRoomKey());
+                    thisRoom.roomData.currentWait +=1;
+                    //Update waiter state
+                    thisRoomReference
+                            .child(ParticipantListEntry.ROOT_NAME)
+                            .child(currentWaiterId)
+                            .child(ParticipantListEntry.WAITER_STATE_ARM)
+                            .setValue(ParticipantListEntry.STATE_IS_DONE)
+                            .addOnFailureListener(e -> Toast.makeText(mContext, "Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                } else {
+                    Toast.makeText(mContext, "Đã hết người chờ trong phòng", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+
+        //skipBtn on click, update current waiter to state isSkip, and increase currentNumber Wait to 1;
+        skipBtn.setOnClickListener(v -> {
+            //Make sure that this room date was loaded from firebase
+            if (currentWaiterId != null) {
+                if (thisRoom.roomData.currentWait < thisRoom.roomData.totalParticipant) {
+                    //Update current wait to 1
+                    roomEntryRequester.update(RoomDataEntry.CURRENT_WAIT_ARM, thisRoom.roomData.currentWait + 1, sessionManager.getCurrentRoomKey());
+                    thisRoom.roomData.currentWait +=1;
+                    //Update waiter state
+                    thisRoomReference
+                            .child(ParticipantListEntry.ROOT_NAME)
+                            .child(currentWaiterId)
+                            .child(ParticipantListEntry.WAITER_STATE_ARM)
+                            .setValue(ParticipantListEntry.STATE_IS_SKIP)
+                            .addOnFailureListener(e -> Toast.makeText(mContext, "Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show());
+                } else {
+                    Toast.makeText(mContext, "Đã hết người chờ trong phòng", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
         return view;
     }
@@ -173,18 +226,36 @@ public class HostRoomWaitingFragment extends Fragment {
     private final ValueEventListener waiterListener = new ValueEventListener() {
         @Override
         public void onDataChange(@NonNull  DataSnapshot snapshot) {
+            Log.d("TEST", "onDataChange: " + "Some thing change currentWait " + thisRoom.roomData.currentWait);
             thisRoom.participantList = new ArrayList<>();
             for (DataSnapshot waiter: snapshot.getChildren()) {
-                thisRoom.participantList.add(waiter.getValue(Participant.class));
+                Participant participant = waiter.getValue(Participant.class);
+                if (participant.waiterNumber == thisRoom.roomData.currentWait) {
+                    thisRoom.participantList.add(waiter.getValue(Participant.class));
+                    //Assign current waiter for easily update later
+                    currentWaiterId = waiter.getKey();
+                } else if (thisRoom.participantList.size() == 1) {
+                    thisRoom.participantList.add(waiter.getValue(Participant.class));
+                }
+
             }
 
-            //Update current waiter into view
-            waiterNameTv.setText(thisRoom.participantList.get(0).waiterName);
-            waiterPhoneTv.setText(thisRoom.participantList.get(0).waiterPhone);
+
+            if (thisRoom.participantList.size() > 0) {
+                //Update current waiter into view
+                waiterNameTv.setText(thisRoom.participantList.get(0).waiterName);
+                waiterPhoneTv.setText(thisRoom.participantList.get(0).waiterPhone);
+            }
 
             //Update next waiter
-            nextWaiterNameTv.setText(thisRoom.participantList.get(1).waiterName);
-            nextWaterPhoneTv.setText(thisRoom.participantList.get(1).waiterPhone);
+            if (thisRoom.participantList.size() > 1) {
+                nextWaiterNameTv.setText(thisRoom.participantList.get(1).waiterName);
+                nextWaterPhoneTv.setText(thisRoom.participantList.get(1).waiterPhone);
+            } else {
+                nextWaiterNameTv.setText("");
+                nextWaterPhoneTv.setText("");
+            }
+
         }
 
         @Override
@@ -192,4 +263,6 @@ public class HostRoomWaitingFragment extends Fragment {
 
         }
     };
+
+
 }
