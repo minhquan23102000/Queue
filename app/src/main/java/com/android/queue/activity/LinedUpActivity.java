@@ -232,6 +232,7 @@ public class LinedUpActivity extends AppCompatActivity {
         });
     }
 
+    //Hàm thay đổi data sau khi tài khoản bỏ lượt
     public void changeNumberAfterSkip(){
         String waiterPhone=sessionManager.getUserData().getString(QueueDatabaseContract.UserEntry.PHONE_ARM);
         RoomEntryRequester tempRoomEntryRequeser=new RoomEntryRequester(LinedUpActivity.this);
