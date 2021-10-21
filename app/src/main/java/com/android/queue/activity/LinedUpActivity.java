@@ -96,7 +96,12 @@ public class LinedUpActivity extends AppCompatActivity {
             }
         });
 
-
+        skipBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeNumberAfterSkip();
+            }
+        });
 
     }
 
@@ -122,7 +127,7 @@ public class LinedUpActivity extends AppCompatActivity {
                     mP_Adapter.notifyDataSetChanged();
                     recyclerView.setAdapter(mP_Adapter);
                     getDataRoomFromFirebase();
-                    updateWaiterNumberafterChange(key);
+                    updateWaiterNumberAfterChange(key);
                 }
             }
             @Override
@@ -205,25 +210,113 @@ public class LinedUpActivity extends AppCompatActivity {
     }
 
 
-    public void updateWaiterNumberafterChange(String roomKey){
+    public void updateWaiterNumberAfterChange(String roomKey){
         RoomEntryRequester tempRoomEntryRequeser=new RoomEntryRequester(LinedUpActivity.this);
         DatabaseReference tempDatabaseRefernce=tempRoomEntryRequeser.find(roomKey);
         Query query = tempDatabaseRefernce.child("participantList");
         query.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
             @Override
             public void onSuccess(DataSnapshot dataSnapshot) {
-                long num=1;
-                for(DataSnapshot snapshot:dataSnapshot.getChildren()){
-                    String waiterKey = snapshot.getKey();
-                    long ktr=snapshot.child("waiterNumber").getValue(long.class);
-                    if(ktr!=(-1)){
-                        tempDatabaseRefernce.child("participantList").child(waiterKey).child("waiterNumber").setValue(num);
-                        num++;
+                if(dataSnapshot.exists()){
+                    long num=1;
+                    for(DataSnapshot snapshot:dataSnapshot.getChildren()){
+                        String waiterKey = snapshot.getKey();
+                        long ktr=snapshot.child("waiterNumber").getValue(long.class);
+                        if(ktr!=(-1)){
+                            tempDatabaseRefernce.child("participantList").child(waiterKey).child("waiterNumber").setValue(num);
+                            num++;
+                        }
                     }
                 }
             }
         });
     }
 
+    public void changeNumberAfterSkip(){
+        String waiterPhone=sessionManager.getUserData().getString(QueueDatabaseContract.UserEntry.PHONE_ARM);
+        RoomEntryRequester tempRoomEntryRequeser=new RoomEntryRequester(LinedUpActivity.this);
+        DatabaseReference tempDatabaseRefernce=tempRoomEntryRequeser.find(key);
+        Query query = tempDatabaseRefernce.child("participantList");
+        query.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    for(DataSnapshot snapshot:dataSnapshot.getChildren()){
+                        //String waiterkey=snapshot.getKey();
+                        String str=snapshot.child("waiterPhone").getValue(String.class);
+                        if(str.equals(waiterPhone)){
+                            long index=snapshot.child("waiterNumber").getValue(long.class);
+                            if(index!=mP_Adapter.getItemCount()){
+                                String strName=snapshot.child("waiterName").getValue(String.class);
+                                String strPhone=snapshot.child("waiterPhone").getValue(String.class);
+                                String strState=snapshot.child("waiterState").getValue(String.class);
+                                Participant waiterChange=new Participant(strPhone,strName,index,strState);
+                                getDataWaiter(index+1);
+                                changeWaiter(waiterChange);
+                            }
+                            else{
+                                Toast.makeText(LinedUpActivity.this, "Bạn đã cuối hàng đợi", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    private Participant participant;
+    public void getDataWaiter(long index){
+
+        RoomEntryRequester tempRoomEntryRequeser=new RoomEntryRequester(LinedUpActivity.this);
+        DatabaseReference tempDatabaseRefernce=tempRoomEntryRequeser.find(key);
+        Query query = tempDatabaseRefernce.child("participantList");
+        query.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    for(DataSnapshot snapshot: dataSnapshot.getChildren()){
+                        long find=snapshot.child("waiterNumber").getValue(long.class);
+                        if(index==find){
+                            String strName=snapshot.child("waiterName").getValue(String.class);
+                            String strPhone=snapshot.child("waiterPhone").getValue(String.class);
+                            String strState=snapshot.child("waiterState").getValue(String.class);
+                            participant=new Participant(strPhone,strName,index,strState);
+                        }
+                }
+                }
+            }
+        });
+        //return participant;
+    }
+
+    public void changeWaiter(Participant a){
+        //String waiterPhone=sessionManager.getUserData().getString(QueueDatabaseContract.UserEntry.PHONE_ARM);
+        RoomEntryRequester tempRoomEntryRequeser=new RoomEntryRequester(LinedUpActivity.this);
+        DatabaseReference tempDatabaseRefernce=tempRoomEntryRequeser.find(key);
+        Query query = tempDatabaseRefernce.child("participantList");
+        query.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()){
+                    for(DataSnapshot snapshot:dataSnapshot.getChildren()) {
+                        String waiterKey = snapshot.getKey();
+                        long numChange=snapshot.child("waiterNumber").getValue(long.class);
+                        if(numChange==a.waiterNumber){
+                            String str1=participant.waiterName;
+                            String str2=participant.waiterPhone;
+                            String str3=participant.waiterState;
+                            tempDatabaseRefernce.child("participantList").child(waiterKey).child("waiterName").setValue(str1);
+                            tempDatabaseRefernce.child("participantList").child(waiterKey).child("waiterPhone").setValue(str2);
+                            tempDatabaseRefernce.child("participantList").child(waiterKey).child("waiterState").setValue(str3);
+                        }
+                        if(numChange==participant.waiterNumber){
+                            tempDatabaseRefernce.child("participantList").child(waiterKey).child("waiterName").setValue(a.waiterName);
+                            tempDatabaseRefernce.child("participantList").child(waiterKey).child("waiterPhone").setValue(a.waiterPhone);
+                            tempDatabaseRefernce.child("participantList").child(waiterKey).child("waiterState").setValue(a.waiterState);
+                        }
+                    }
+                }
+            }
+        });
+    }
 
 }
