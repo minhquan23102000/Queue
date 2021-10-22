@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.android.queue.R;
 import com.android.queue.SessionManager;
+import com.android.queue.activity.HostActivity;
 import com.android.queue.adapters.StatsRoomAdapter;
 import com.android.queue.firebase.realtimedatabase.RoomEntryRequester;
 import com.android.queue.models.Participant;
@@ -192,6 +193,13 @@ public class HostRoomWaitingFragment extends Fragment {
                     waiterPhoneTv.setText("");
                     waiterNameTv.setText("");
                 }
+            }
+        });
+
+        viewListParticipantBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((HostActivity) mActivity).navigateTo(new WaiterListFragment(), true);
             }
         });
 
