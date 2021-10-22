@@ -11,8 +11,8 @@
         android:layout_marginTop="150dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="XÁC MINH SỐ ĐIỆN THOẠI"
-        android:textSize="30dp"
+        android:text="XÁC THỰC SỐ ĐIỆN THOẠI"
+        android:textSize="25dp"
         android:textColor="@color/purple_500"
         android:layout_gravity="center">
     </TextView>
@@ -23,7 +23,7 @@
         android:layout_marginTop="20dp">
 
 
-        <EditText
+        <TextView
             android:id="@+id/edtPhone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -135,7 +135,7 @@
         android:layout_gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Gửi lại mã" />
+        android:text="Nhận mã OTP" />
     <Button
         android:id="@+id/btnVerify"
         android:layout_marginTop="20dp"

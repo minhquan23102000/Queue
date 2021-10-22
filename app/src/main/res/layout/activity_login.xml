@@ -86,13 +86,26 @@
             android:layout_marginEnd="18dp"
             android:text="Đăng nhập" />
 
-        <TextView
-            android:id="@+id/regTv"
+        <LinearLayout
+            android:layout_marginTop="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:text="Bạn chưa có tài khoản? Đăng kí ngay"
-            android:textSize="15dp"></TextView>
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bạn chưa có tài khoản?"
+                android:textSize="15dp"></TextView>
+            <TextView
+                android:id="@+id/regTv"
+                android:layout_marginLeft="7dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Đăng kí ngay"
+                android:textColor="@color/purple_700"
+                android:textSize="15dp"></TextView>
+        </LinearLayout>
+
         <!--        <com.google.android.material.button.MaterialButton-->
         <!--            android:id="@+id/regBtn"-->
         <!--            android:layout_width="wrap_content"-->

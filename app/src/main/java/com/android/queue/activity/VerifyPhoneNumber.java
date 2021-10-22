@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.queue.R;
@@ -44,7 +45,8 @@ public class VerifyPhoneNumber extends AppCompatActivity {
     private String TAG = "firebase - REGISTER";
     private String mVerificationId;
 
-    EditText edtNum1, edtNum2, edtNum3, edtNum4, edtNum5, edtNum6, edtPhone;
+    EditText edtNum1, edtNum2, edtNum3, edtNum4, edtNum5, edtNum6;
+    TextView edtPhone;
     Button btnSendOTP;
     Button btnVerify;
 
