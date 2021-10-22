@@ -30,28 +30,24 @@
         android:layout_weight="0.4"
         android:textAppearance="@style/TextAppearance.Reply.Body2" />
 
-    <RelativeLayout
+
+    <androidx.cardview.widget.CardView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="4dp"
-        android:background="@color/reply_white_50">
+        android:layout_margin="4dp"
+        android:layout_centerInParent="true"
+        app:cardBackgroundColor="@color/reply_white_50"
+        app:cardCornerRadius="24dp"
+        app:strokeColor="@color/reply_white_50">
 
-        <androidx.cardview.widget.CardView
+        <TextView
+            android:id="@+id/waiterState"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            app:cardBackgroundColor="@color/reply_white_50"
-            app:cardCornerRadius="24dp"
-            app:strokeColor="@color/reply_white_50">
+            android:layout_margin="5dp"
+            android:text="Chờ"
+            android:textAppearance="@style/TextAppearance.Reply.Caption"
+            android:textColor="@color/reply_orange_500" />
+    </androidx.cardview.widget.CardView>
 
-            <TextView
-                android:id="@+id/waiterState"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:text="Chờ"
-                android:textAppearance="@style/TextAppearance.Reply.Caption"
-                android:textColor="@color/reply_orange_500" />
-        </androidx.cardview.widget.CardView>
-    </RelativeLayout>
 </LinearLayout>
