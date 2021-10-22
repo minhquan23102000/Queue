@@ -15,7 +15,7 @@ import android.widget.Toast;
 
 import com.android.queue.R;
 import com.android.queue.SessionManager;
-import com.android.queue.adapter.ParticipantAdapter;
+import com.android.queue.adapters.ParticipantAdapter;
 import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract;
 import com.android.queue.firebase.realtimedatabase.RoomEntryRequester;
 import com.android.queue.models.Participant;
@@ -28,8 +28,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.function.Consumer;
 
 public class LinedUpActivity extends AppCompatActivity {
 

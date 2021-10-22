@@ -12,12 +12,4 @@
   or implied. See the License for the specific language governing permissions and limitations under
   the License.
   -->
-<resources>
-    <array name="preloaded_fonts" translatable="false">
-        <item>@font/work_sans</item>
-        <item>@font/work_sans_bold</item>
-        <item>@font/work_sans_extrabold</item>
-        <item>@font/work_sans_medium</item>
-        <item>@font/work_sans_semibold</item>
-    </array>
-</resources>
+<resources></resources>
