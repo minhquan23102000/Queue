@@ -151,10 +151,12 @@ public class HostRoomWaitingFragment extends Fragment {
         doneBtn.setOnClickListener(v -> {
             //Make sure that this room date was loaded from firebase
             if (currentWaiterId != null) {
-                if (thisRoom.roomData.currentWait < thisRoom.roomData.totalParticipant) {
+                if (thisRoom.roomData.timeStart > System.currentTimeMillis()) {
+                    Toast.makeText(mContext, "Chưa đến giờ bắt đầu hàng chờ", Toast.LENGTH_SHORT).show();
+                } else if (thisRoom.roomData.currentWait <= thisRoom.roomData.totalParticipant) {
                     //Update current wait to 1
                     roomEntryRequester.update(RoomDataEntry.CURRENT_WAIT_ARM, thisRoom.roomData.currentWait + 1, sessionManager.getCurrentRoomKey());
-                    thisRoom.roomData.currentWait +=1;
+                    thisRoom.roomData.currentWait += 1;
                     //Update waiter state
                     thisRoomReference
                             .child(ParticipantListEntry.ROOT_NAME)
@@ -176,10 +178,12 @@ public class HostRoomWaitingFragment extends Fragment {
         skipBtn.setOnClickListener(v -> {
             //Make sure that this room date was loaded from firebase
             if (currentWaiterId != null) {
-                if (thisRoom.roomData.currentWait < thisRoom.roomData.totalParticipant) {
+                if (thisRoom.roomData.timeStart > System.currentTimeMillis()) {
+                    Toast.makeText(mContext, "Chưa đến giờ bắt đầu hàng chờ", Toast.LENGTH_SHORT).show();
+                } else if (thisRoom.roomData.currentWait <= thisRoom.roomData.totalParticipant) {
                     //Update current wait to 1
                     roomEntryRequester.update(RoomDataEntry.CURRENT_WAIT_ARM, thisRoom.roomData.currentWait + 1, sessionManager.getCurrentRoomKey());
-                    thisRoom.roomData.currentWait +=1;
+                    thisRoom.roomData.currentWait += 1;
                     //Update waiter state
                     thisRoomReference
                             .child(ParticipantListEntry.ROOT_NAME)
@@ -189,13 +193,15 @@ public class HostRoomWaitingFragment extends Fragment {
                             .addOnFailureListener(e -> Toast.makeText(mContext, "Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show());
                 } else {
                     Toast.makeText(mContext, "Đã hết người chờ trong phòng", Toast.LENGTH_SHORT).show();
+                    waiterNumberTv.setText("hết");
+                    waiterPhoneTv.setText("");
+                    waiterNameTv.setText("");
                 }
             }
         });
 
         return view;
     }
-
 
 
     //Value event listener to update room data
@@ -230,10 +236,10 @@ public class HostRoomWaitingFragment extends Fragment {
     //even listener to update current participants.
     private final ValueEventListener waiterListener = new ValueEventListener() {
         @Override
-        public void onDataChange(@NonNull  DataSnapshot snapshot) {
+        public void onDataChange(@NonNull DataSnapshot snapshot) {
             Log.d("TEST", "onDataChange: " + "Some thing change currentWait " + thisRoom.roomData.currentWait);
             thisRoom.participantList = new ArrayList<>();
-            for (DataSnapshot waiter: snapshot.getChildren()) {
+            for (DataSnapshot waiter : snapshot.getChildren()) {
                 Participant participant = waiter.getValue(Participant.class);
                 if (participant.waiterNumber == thisRoom.roomData.currentWait) {
                     thisRoom.participantList.add(waiter.getValue(Participant.class));
