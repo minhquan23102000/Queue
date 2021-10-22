@@ -38,9 +38,24 @@ public class WaiterListFragment extends Fragment {
     private ArrayList<Participant> participantList;
     private MyWaiterAdapter adapter;
 
+    private long currentWait;
+
+
+    public static WaiterListFragment newInstance(long currentWait) {
+        WaiterListFragment fragment = new WaiterListFragment();
+        Bundle args = new Bundle();
+        args.putLong(RoomDataEntry.CURRENT_WAIT_ARM, currentWait);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            currentWait = getArguments().getLong(RoomDataEntry.CURRENT_WAIT_ARM);
+        }
 
         sessionManager = new SessionManager(getContext());
         roomEntryRequester = new RoomEntryRequester(getContext());

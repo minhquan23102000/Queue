@@ -26,8 +26,10 @@
 
     <color name="reply_orange_400">#f9be64</color>
     <color name="reply_orange_500">#f9aa33</color>
-
+    <color name="reply_orange_700">#f47100</color>
+    <color name="reply_red_600">#E53935</color>
     <color name="reply_red_400">#ff4c5d</color>
+    <color name="reply_green_700">#41c300</color>
 
     <color name="reply_white_50_alpha_060">#99ffffff</color>
 

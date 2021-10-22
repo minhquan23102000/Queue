@@ -54,13 +54,14 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/plane_16"
-                    android:layout_weight="0.15"
+                    android:layout_weight="0.12"
                     android:text="STT"
                     android:textAppearance="@style/TextAppearance.Reply.Subtitle1" />
 
@@ -68,7 +69,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/plane_16"
-                    android:layout_weight="0.5"
+                    android:layout_weight="0.45"
                     android:text="Họ và tên"
                     android:textAppearance="@style/TextAppearance.Reply.Subtitle1" />
 
@@ -76,8 +77,17 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/plane_16"
-                    android:layout_weight="0.3"
+                    android:layout_weight="0.35"
                     android:text="Điện thoại"
+                    android:textAppearance="@style/TextAppearance.Reply.Subtitle1" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="0.15"
+                    android:text=""
                     android:textAppearance="@style/TextAppearance.Reply.Subtitle1" />
             </LinearLayout>
 
