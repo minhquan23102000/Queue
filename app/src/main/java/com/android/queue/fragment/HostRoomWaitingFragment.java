@@ -99,7 +99,7 @@ public class HostRoomWaitingFragment extends Fragment {
 //        Participant participant1 = new Participant("0123456789", "Tester1", 1L, ParticipantListEntry.STATE_IS_WAIT);
 //        Participant participant2 = new Participant("0123456788", "Tester2", 2L, ParticipantListEntry.STATE_IS_WAIT);
 //        Participant participant3 = new Participant("0123456787", "Tester3", 3L, ParticipantListEntry.STATE_IS_WAIT);
-//        Participant participant4 = new Participant("0123456786", "Tester4", 4L, ParticipantListEntry.STATE_IS_WAIT);
+//        Participant participant4 = new Participant("0123456786", "Tester4", 4L, ParticipantListEntry.STATE_IS_LEFT);
 //        Participant participant5 = new Participant("0123456789", "Tester5", 5L, ParticipantListEntry.STATE_IS_WAIT);
 //        Participant participant6 = new Participant("0123456788", "Tester6", 6L, ParticipantListEntry.STATE_IS_WAIT);
 //        Participant participant7 = new Participant("0123456787", "Tester7", 7L, ParticipantListEntry.STATE_IS_WAIT);
@@ -199,7 +199,8 @@ public class HostRoomWaitingFragment extends Fragment {
         viewListParticipantBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((HostActivity) mActivity).navigateTo(new WaiterListFragment(), true);
+                ((HostActivity) mActivity)
+                        .navigateTo(WaiterListFragment.newInstance(thisRoom.roomData.currentWait), false);
             }
         });
 

@@ -11,6 +11,7 @@
         android:layout_height="56dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
+        android:layout_marginTop="2dp"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
@@ -24,15 +25,16 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/filter"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="12dp">
+            android:layout_height="wrap_content">
 
             <AutoCompleteTextView
                 android:id="@+id/filled_exposed_dropdown"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@color/reply_black_900"
+                android:text="Tất cả"
                 android:enabled="false" />
 
         </com.google.android.material.textfield.TextInputLayout>
@@ -54,13 +56,14 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/plane_16"
-                    android:layout_weight="0.15"
+                    android:layout_weight="0.12"
                     android:text="STT"
                     android:textAppearance="@style/TextAppearance.Reply.Subtitle1" />
 
@@ -68,7 +71,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/plane_16"
-                    android:layout_weight="0.5"
+                    android:layout_weight="0.45"
                     android:text="Họ và tên"
                     android:textAppearance="@style/TextAppearance.Reply.Subtitle1" />
 
@@ -76,8 +79,17 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/plane_16"
-                    android:layout_weight="0.3"
+                    android:layout_weight="0.35"
                     android:text="Điện thoại"
+                    android:textAppearance="@style/TextAppearance.Reply.Subtitle1" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="0.15"
+                    android:text=""
                     android:textAppearance="@style/TextAppearance.Reply.Subtitle1" />
             </LinearLayout>
 

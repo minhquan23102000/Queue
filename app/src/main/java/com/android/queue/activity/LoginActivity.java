@@ -17,6 +17,7 @@ import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract;
 import com.android.queue.firebase.realtimedatabase.UserAccountsRequester;
 import com.android.queue.models.UserAccounts;
 import com.android.queue.utils.MD5Encode;
+import com.android.queue.utils.NotificationDevice;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
@@ -37,10 +38,10 @@ public class LoginActivity extends AppCompatActivity {
     private TextView regTv;
     TextInputLayout phoneTv;
     TextInputLayout passwordTv;
-    String string_Pattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
 
     UserAccountsRequester userAccountsRequester;
     SessionManager sessionManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,11 +53,17 @@ public class LoginActivity extends AppCompatActivity {
         loginBtn = findViewById(R.id.loginBtn);
         regTv = findViewById(R.id.regTv);
 
+
         phoneTv.getEditText().addTextChangedListener(textWatcher);
         passwordTv.getEditText().addTextChangedListener(textWatcher);
 
         userAccountsRequester = new UserAccountsRequester(this);
         sessionManager = new SessionManager(this);
+
+        //test noti
+        NotificationDevice.headsUpNotification(LoginActivity.this);
+
+
 
 
         loginBtn.setOnClickListener(new View.OnClickListener() {
