@@ -14,14 +14,14 @@
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/welcomeRoom"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
         android:layout_width="400dp"
         android:layout_height="60dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
         android:gravity="center_horizontal"
         android:text=""
-        android:textSize="30dp"
-        android:textAppearance="@style/TextAppearance.Reply.Headline5" />
+        android:textAppearance="@style/TextAppearance.Reply.Headline5"
+        android:textSize="25dp" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/statusRoom"
@@ -52,25 +52,43 @@
             android:layout_height="match_parent" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <LinearLayout
 
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/joinBtn"
         android:layout_width="wrap_content"
+        android:layout_gravity="center"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/iKey"
-        android:layout_centerHorizontal="true"
-        android:text="Tham gia"
         android:orientation="horizontal"
-        />
+        android:layout_below="@+id/iKey"
+        android:layout_centerHorizontal="true">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/homeBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/iKey"
+            android:layout_centerHorizontal="true"
+            android:orientation="horizontal"
+            android:text="Trang chủ" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/joinBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/iKey"
+            android:layout_marginLeft="20dp"
+            android:layout_centerHorizontal="true"
+            android:orientation="horizontal"
+            android:text="Tham gia" />
+    </LinearLayout>
+
 
     <ImageButton
         android:id="@+id/scanBtn"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:layout_below="@+id/joinBtn"
+        android:layout_below="@+id/iKey"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="210dp"
+        android:layout_marginTop="245dp"
         android:background="@drawable/btnscan"
         android:src="@drawable/outline_qr_code_scanner_white_48"></ImageButton>
 

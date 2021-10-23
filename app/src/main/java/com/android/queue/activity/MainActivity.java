@@ -8,6 +8,7 @@ import android.view.View;
 
 import com.android.queue.R;
 import com.android.queue.SessionManager;
+import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract;
 import com.android.queue.firebase.realtimedatabase.UserAccountsRequester;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textview.MaterialTextView;
@@ -84,6 +85,10 @@ public class MainActivity extends AppCompatActivity {
             if (userData.getBoolean(UserEntry.IS_HOST_ARM, false)) {
                 Intent intent = new Intent(MainActivity.this, HostActivity.class);
                 MainActivity.this.startActivity(intent);
+            }else{
+                Intent intent = new Intent(MainActivity.this,LinedUpActivity.class);
+                intent.putExtra("keyRoom",sessionManager.getUserData().getString(QueueDatabaseContract.UserEntry.CURRENT_ROOM_ARM));
+                startActivity(intent);
             }
         }
     }
