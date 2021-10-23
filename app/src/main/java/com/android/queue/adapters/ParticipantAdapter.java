@@ -1,14 +1,19 @@
 package com.android.queue.adapters;
 
+import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.queue.R;
+import com.android.queue.SessionManager;
+import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract;
 import com.android.queue.models.Participant;
 
 import java.util.List;
@@ -16,9 +21,16 @@ import java.util.List;
 public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.ParticipantViewHolder>{
 
     private List<Participant> mListParticipant;
+    private SessionManager sessionManager;
+    private Context mContext;
 
     public ParticipantAdapter(List<Participant> mListParticipant) {
         this.mListParticipant = mListParticipant;
+    }
+    public ParticipantAdapter(Context context,List<Participant> mListParticipant) {
+        this.mListParticipant = mListParticipant;
+        mContext=context;
+        sessionManager = new SessionManager(mContext);
     }
 
     @NonNull
@@ -31,6 +43,7 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ParticipantViewHolder holder, int position) {
+        String waiterPhone=sessionManager.getUserData().getString(QueueDatabaseContract.UserEntry.PHONE_ARM);
         Participant participant=mListParticipant.get(position);
         if(participant==null){
             return;
@@ -39,8 +52,13 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
             holder.tv_Name.setText(participant.getWaiterName());
             holder.sTT.setText("STT: "+participant.getWaiterNumber());
             holder.state.setText(participant.waiterState);
+            if(participant.waiterPhone.equals(waiterPhone)){
+                //holder.tv_Name.setTextColor(Color.parseColor("#2A9D8F"));
+                //holder.sTT.setTextColor(Color.parseColor("#2A9D8F"));
+                //holder.state.setTextColor(Color.parseColor("#2A9D8F"));
+                holder.linearLayout.setBackgroundColor(Color.parseColor("#2A9D8F"));
+            }
         }
-
     }
 
     @Override
@@ -68,6 +86,7 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
         private TextView tv_Name;
         private TextView sTT;
         private TextView state;
+        private LinearLayout linearLayout;
 
 
         public ParticipantViewHolder(@NonNull View itemView) {
@@ -75,6 +94,7 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
             tv_Name = itemView.findViewById(R.id.tv_name);
             sTT = itemView.findViewById(R.id.soTT);
             state = itemView.findViewById(R.id.stateTv);
+            linearLayout= itemView.findViewById(R.id.linearLayout);
         }
     }
 }

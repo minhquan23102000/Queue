@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -46,14 +47,17 @@ public class LinedUpActivity extends AppCompatActivity {
     private static ParticipantAdapter mP_Adapter;
     private List<Participant> listParticipant;
     private String key;
+    private long indexWaiter,indexWaiterAfterChange=-100;
+    private CountDownTimer w;
+
     //private long[] numberList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lined_up);
 
-        txtRoomName = findViewById(R.id.rNameTv);
-        txtHostName = findViewById(R.id.hostNameTv);
+        txtRoomName = findViewById(R.id.hostNameTv);
+        //txtHostName = findViewById(R.id.hostNameTv);
         txtHostPhone = findViewById(R.id.hostPhoneTv);
         txtAdress = findViewById(R.id.hostAdressTv);
         txtWaiterNumber = findViewById(R.id.sisoTv);
@@ -71,7 +75,7 @@ public class LinedUpActivity extends AppCompatActivity {
         recyclerView.addItemDecoration(dividerItemDecoration);
 
         listParticipant = new ArrayList<>();
-        mP_Adapter = new ParticipantAdapter(listParticipant);
+        mP_Adapter = new ParticipantAdapter(LinedUpActivity.this,listParticipant);
 
         recyclerView.setAdapter(mP_Adapter);
 
@@ -81,16 +85,18 @@ public class LinedUpActivity extends AppCompatActivity {
         key = intent.getStringExtra("keyRoom");
 
         roomEntryRequester = new RoomEntryRequester(LinedUpActivity.this);
-        //databaseReference= roomEntryRequester.find(key).getDatabase().getReference("participantList");
         databaseReference= roomEntryRequester.find(key);
-        //updateSTT();
         getListParticipant();
+
+
+
 
         leavebtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 leaveRoom();
                 getListParticipant();
+                onBackPressed();
             }
         });
 
@@ -98,6 +104,7 @@ public class LinedUpActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 changeNumberAfterSkip();
+                //onBackPressed();
             }
         });
 
@@ -126,6 +133,17 @@ public class LinedUpActivity extends AppCompatActivity {
                     recyclerView.setAdapter(mP_Adapter);
                     getDataRoomFromFirebase();
                     updateWaiterNumberAfterChange(key);
+                    indexWaiter=(long)findPositionUser();
+                    if(indexWaiter!=indexWaiterAfterChange){
+                        //onBackPressed();
+                        if(indexWaiterAfterChange==-100){
+                            timeWaitCountDown();
+                        }else{
+                            onBackPressed();
+                            timeWaitCountDown();
+                        }
+
+                    }
                 }
             }
             @Override
@@ -147,24 +165,68 @@ public class LinedUpActivity extends AppCompatActivity {
                     String str2=snapshot.child("hostPhone").getValue(String.class);
                     String str3=snapshot.child("address").getValue(String.class);
                     Long longMax=snapshot.child("maxParticipant").getValue(Long.class);
-                    double waitTime= snapshot.child("timeWait").getValue(double.class);
                     int count=mP_Adapter.getIsWaiterCount();
                     txtRoomName.setText("Tên phòng: "+str1);
                     txtHostPhone.setText(str2);
                     txtAdress.setText(str3);
                     txtWaiterNumber.setText("SS: "+String.valueOf(count) + " / "+longMax.toString());
-                    double pos=findPositionUser();
-                    double time=waitTime*(pos-1);
-                    txtTime.setText(String.valueOf(time)+" phút");
+                    /*double pos=findPositionUser();
+                    double waitTime= snapshot.child("timeWait").getValue(double.class);
+                    double waitTimeDelay= snapshot.child("timeDelay").getValue(double.class);
+                    long time=(long)(waitTime+waitTimeDelay)*(long)(pos-1);
+                    txtTime.setText(String.valueOf(time)+" phút");*/
                 }
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(LinedUpActivity.this, "Error", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
+    private void timeWaitCountDown(){
+        RoomEntryRequester tempRoom=new RoomEntryRequester(LinedUpActivity.this);
+        DatabaseReference tempDatabase=tempRoom.find(key);
+        Query query = tempDatabase.child("roomData");
+        query.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists()) {
+                    double waitTime= dataSnapshot.child("timeWait").getValue(double.class);
+                    double waitTimeDelay= dataSnapshot.child("timeDelay").getValue(double.class);
+                    long time=(long)(waitTime+waitTimeDelay)*(long)(indexWaiter-1);
+                    indexWaiterAfterChange=indexWaiter;
+                    timeContDown(time-1);
+                }
+            }
+        });
+    }
+
+    public void onBackPressed()
+    {
+        w.cancel();
+        //finish();
+    }
+
+    private void timeContDown(long timeMinute){
+        if(timeMinute!=-1){
+            w=new CountDownTimer(60000, 1000) {
+                public void onTick(long mil) {
+                    txtTime.setText(timeMinute +" m "+mil/1000+" s");
+                    if(indexWaiter!=indexWaiterAfterChange){
+                        onBackPressed();
+                    }
+                }
+                public void onFinish() {
+                        timeContDown(timeMinute-1);
+                }
+            }.start();
+        }else{
+            Toast.makeText(LinedUpActivity.this, "Chờ gì lâu thế :v", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
     
     private double findPositionUser(){
         String waiterPhone=sessionManager.getUserData().getString(QueueDatabaseContract.UserEntry.PHONE_ARM);
@@ -231,7 +293,7 @@ public class LinedUpActivity extends AppCompatActivity {
     }
 
     //Hàm thay đổi data sau khi tài khoản bỏ lượt
-    public void changeNumberAfterSkip(){
+    private void changeNumberAfterSkip(){
         String waiterPhone=sessionManager.getUserData().getString(QueueDatabaseContract.UserEntry.PHONE_ARM);
         RoomEntryRequester tempRoomEntryRequeser=new RoomEntryRequester(LinedUpActivity.this);
         DatabaseReference tempDatabaseRefernce=tempRoomEntryRequeser.find(key);
@@ -287,7 +349,7 @@ public class LinedUpActivity extends AppCompatActivity {
         //return participant;
     }
 
-    public void changeWaiter(Participant a){
+    private void changeWaiter(Participant a){
         //String waiterPhone=sessionManager.getUserData().getString(QueueDatabaseContract.UserEntry.PHONE_ARM);
         RoomEntryRequester tempRoomEntryRequeser=new RoomEntryRequester(LinedUpActivity.this);
         DatabaseReference tempDatabaseRefernce=tempRoomEntryRequeser.find(key);
