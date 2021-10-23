@@ -51,13 +51,13 @@ public class Participant {
         this.waiterNumber = waiterNumber;
     }
 
-    public Participant( String waiterName, Long waiterNumber, String waiterPhone, String waiterState) {
+    /*public Participant( String waiterName, Long waiterNumber, String waiterPhone, String waiterState) {
 
         this.waiterName = waiterName;
         this.waiterState = waiterState;
         this.waiterPhone = waiterPhone;
         this.waiterNumber = waiterNumber;
-    }
+    }*/
 
     public Participant() {}
 }

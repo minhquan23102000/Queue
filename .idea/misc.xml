@@ -28,11 +28,15 @@
         <entry key="..\:/D/Android/Queue/app/src/main/res/layout/activity_scan_qr.xml" value="0.14628623188405798" />
         <entry key="..\:/D/Android/Queue/app/src/main/res/layout/item_participant.xml" value="0.2115036231884058" />
         <entry key="..\:/D/Android/Queue/app/src/main/res/menu/bottom_nav_menu.xml" value="0.13020833333333334" />
+        <entry key="..\:/D/LTDD_DoAn/Queue/app/src/main/res/drawable/avatar_none.xml" value="0.2703125" />
         <entry key="..\:/D/LTDD_DoAn/Queue/app/src/main/res/drawable/outline_room_24.xml" value="0.24351851851851852" />
         <entry key="..\:/D/LTDD_DoAn/Queue/app/src/main/res/drawable/oval.xml" value="0.2703125" />
         <entry key="..\:/D/LTDD_DoAn/Queue/app/src/main/res/layout/activity_create_room.xml" value="0.11851851851851852" />
+        <entry key="..\:/D/LTDD_DoAn/Queue/app/src/main/res/layout/activity_inputkey.xml" value="0.4" />
         <entry key="..\:/D/LTDD_DoAn/Queue/app/src/main/res/layout/activity_lined_up.xml" value="0.4" />
+        <entry key="..\:/D/LTDD_DoAn/Queue/app/src/main/res/layout/activity_login.xml" value="0.2006340579710145" />
         <entry key="..\:/D/LTDD_DoAn/Queue/app/src/main/res/layout/activity_main.xml" value="0.21240942028985507" />
+        <entry key="..\:/D/LTDD_DoAn/Queue/app/src/main/res/layout/activity_register.xml" value="0.2006340579710145" />
         <entry key="..\:/D/LTDD_DoAn/Queue/app/src/main/res/layout/fragment_host_room_waiting.xml" value="0.21240942028985507" />
         <entry key="..\:/D/LTDD_DoAn/Queue/app/src/main/res/layout/fragment_participant.xml" value="0.182518115942029" />
         <entry key="..\:/D/LTDD_DoAn/Queue/app/src/main/res/layout/fragment_participant_list.xml" value="0.182518115942029" />
