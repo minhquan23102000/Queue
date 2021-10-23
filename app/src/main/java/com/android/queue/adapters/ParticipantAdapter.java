@@ -57,6 +57,7 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
                 //holder.sTT.setTextColor(Color.parseColor("#2A9D8F"));
                 //holder.state.setTextColor(Color.parseColor("#2A9D8F"));
                 holder.linearLayout.setBackgroundColor(Color.parseColor("#2A9D8F"));
+                //holder.linearLayout.set
             }
         }
     }

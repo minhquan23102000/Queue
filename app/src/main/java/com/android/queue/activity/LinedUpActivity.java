@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.View;
@@ -20,6 +21,7 @@ import com.android.queue.adapters.ParticipantAdapter;
 import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract;
 import com.android.queue.firebase.realtimedatabase.RoomEntryRequester;
 import com.android.queue.models.Participant;
+import com.android.queue.utils.NotificationDevice;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -48,7 +50,9 @@ public class LinedUpActivity extends AppCompatActivity {
     private List<Participant> listParticipant;
     private String key;
     private long indexWaiter,indexWaiterAfterChange=-100;
-    private CountDownTimer w;
+    private boolean skip;
+    CountDownTimer w;
+    private boolean isTimer;
 
     //private long[] numberList;
     @Override
@@ -64,6 +68,7 @@ public class LinedUpActivity extends AppCompatActivity {
         txtTime = findViewById(R.id.time);
         skipBtn = findViewById(R.id.skipBtn);
         leavebtn = findViewById(R.id.leaveBtn);
+        skip=false;//isTimer=false;
 
         sessionManager = new SessionManager(this);
         
@@ -83,6 +88,7 @@ public class LinedUpActivity extends AppCompatActivity {
 
         Intent intent=getIntent();
         key = intent.getStringExtra("keyRoom");
+        sessionManager.initKeyAfterUserJoinRoom(key);
 
         roomEntryRequester = new RoomEntryRequester(LinedUpActivity.this);
         databaseReference= roomEntryRequester.find(key);
@@ -91,20 +97,26 @@ public class LinedUpActivity extends AppCompatActivity {
 
 
 
+
+
         leavebtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                leaveRoom();
-                getListParticipant();
+                //w.cancel();
                 onBackPressed();
+                leaveRoom();
+                //getListParticipant();
             }
         });
 
         skipBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changeNumberAfterSkip();
                 //onBackPressed();
+                //w.cancel();
+                skip=true;
+                changeNumberAfterSkip();
+                getListParticipant();
             }
         });
 
@@ -134,16 +146,26 @@ public class LinedUpActivity extends AppCompatActivity {
                     getDataRoomFromFirebase();
                     updateWaiterNumberAfterChange(key);
                     indexWaiter=(long)findPositionUser();
-                    if(indexWaiter!=indexWaiterAfterChange){
+                    if(indexWaiter!=-1){
+                        //w.cancel();
                         //onBackPressed();
-                        if(indexWaiterAfterChange==-100){
-                            timeWaitCountDown();
-                        }else{
-                            onBackPressed();
-                            timeWaitCountDown();
-                        }
-
-                    }
+                        if(skip!=true){
+                            //w.cancel();
+                            //onBackPressed();
+                            if(indexWaiter!=indexWaiterAfterChange){
+                                //onBackPressed();
+                                if(indexWaiterAfterChange==-100){
+                                    isTimer=true;
+                                    timeWaitCountDown();
+                                }else{
+                                    onBackPressed();
+                                    // w.cancel();
+                                    isTimer=true;
+                                    timeWaitCountDown();
+                                }
+                            }
+                        }else onBackPressed();
+                    }else onBackPressed();
                 }
             }
             @Override
@@ -204,27 +226,50 @@ public class LinedUpActivity extends AppCompatActivity {
 
     public void onBackPressed()
     {
-        w.cancel();
+        if(w!=null){
+            w.cancel();
+            w=null;
+            isTimer=false;
+        }
+
         //finish();
     }
 
     private void timeContDown(long timeMinute){
-        if(timeMinute!=-1){
-            w=new CountDownTimer(60000, 1000) {
-                public void onTick(long mil) {
-                    txtTime.setText(timeMinute +" m "+mil/1000+" s");
-                    if(indexWaiter!=indexWaiterAfterChange){
-                        onBackPressed();
+        if(isTimer!=false){
+            if(timeMinute!=-1){
+                w=new CountDownTimer(60000, 1000) {
+                    public void onTick(long mil) {
+                        txtTime.setText(timeMinute +" m "+mil/1000+" s");
+                        if(indexWaiter==-1){
+                            //w.cancel();
+                            onBackPressed();
+                        }
+                        if(indexWaiter!=indexWaiterAfterChange){
+                            onBackPressed();
+                            //w.cancel();
+                        }
                     }
-                }
-                public void onFinish() {
+                    public void onFinish() {
+                        onBackPressed();
+                        if(timeMinute==30){
+                            NotificationDevice.headsUpNotification(LinedUpActivity.this);
+                        }
+                        if(timeMinute==10){
+                            NotificationDevice.headsUpNotification(LinedUpActivity.this);
+                        }
+                        if(timeMinute==5){
+                            NotificationDevice.headsUpNotification(LinedUpActivity.this);
+                        }
                         timeContDown(timeMinute-1);
-                }
-            }.start();
-        }else{
-            Toast.makeText(LinedUpActivity.this, "Chờ gì lâu thế :v", Toast.LENGTH_SHORT).show();
+                    }
+                }.start();
+            }else{
+                onBackPressed();
+                //w.cancel();
+                Toast.makeText(LinedUpActivity.this, "Chờ gì lâu thế :v", Toast.LENGTH_SHORT).show();
+            }
         }
-
     }
 
     
@@ -255,6 +300,12 @@ public class LinedUpActivity extends AppCompatActivity {
                             int i=mP_Adapter.getItemCount();
                             updateAfterLeave(waiterKey);
                             tempRoom.updateTotalParticipantafterChange(key);
+                            sessionManager.clearKeyRoomAfterLeave();
+                            //w.cancel();
+                            onBackPressed();
+                            indexWaiter=indexWaiterAfterChange=-100;
+                            Intent intent=new Intent(LinedUpActivity.this,MainActivity.class);
+                            startActivity(intent);
                         }
                     }
                 }
@@ -294,6 +345,9 @@ public class LinedUpActivity extends AppCompatActivity {
 
     //Hàm thay đổi data sau khi tài khoản bỏ lượt
     private void changeNumberAfterSkip(){
+        //onBackPressed();
+        skip=true;
+        //w.cancel();
         String waiterPhone=sessionManager.getUserData().getString(QueueDatabaseContract.UserEntry.PHONE_ARM);
         RoomEntryRequester tempRoomEntryRequeser=new RoomEntryRequester(LinedUpActivity.this);
         DatabaseReference tempDatabaseRefernce=tempRoomEntryRequeser.find(key);
@@ -306,7 +360,7 @@ public class LinedUpActivity extends AppCompatActivity {
                         //String waiterkey=snapshot.getKey();
                         String str=snapshot.child("waiterPhone").getValue(String.class);
                         if(str.equals(waiterPhone)){
-                            long index=snapshot.child("waiterNumber").getValue(long.class);
+                            Long index=snapshot.child("waiterNumber").getValue(Long.class);
                             if(index!=mP_Adapter.getItemCount()){
                                 String strName=snapshot.child("waiterName").getValue(String.class);
                                 String strPhone=snapshot.child("waiterPhone").getValue(String.class);
@@ -325,8 +379,7 @@ public class LinedUpActivity extends AppCompatActivity {
         });
     }
     private Participant participant;
-    public void getDataWaiter(long index){
-
+    public void getDataWaiter(Long index){
         RoomEntryRequester tempRoomEntryRequeser=new RoomEntryRequester(LinedUpActivity.this);
         DatabaseReference tempDatabaseRefernce=tempRoomEntryRequeser.find(key);
         Query query = tempDatabaseRefernce.child("participantList");
@@ -335,12 +388,12 @@ public class LinedUpActivity extends AppCompatActivity {
             public void onSuccess(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
                     for(DataSnapshot snapshot: dataSnapshot.getChildren()){
-                        long find=snapshot.child("waiterNumber").getValue(long.class);
+                        Long find=snapshot.child("waiterNumber").getValue(Long.class);
                         if(index==find){
                             String strName=snapshot.child("waiterName").getValue(String.class);
                             String strPhone=snapshot.child("waiterPhone").getValue(String.class);
                             String strState=snapshot.child("waiterState").getValue(String.class);
-                            participant=new Participant(strPhone,strName,index,strState);
+                            participant=new Participant(strPhone,strName,find,strState);
                         }
                 }
                 }
@@ -350,6 +403,8 @@ public class LinedUpActivity extends AppCompatActivity {
     }
 
     private void changeWaiter(Participant a){
+        onBackPressed();
+        //w.cancel();
         //String waiterPhone=sessionManager.getUserData().getString(QueueDatabaseContract.UserEntry.PHONE_ARM);
         RoomEntryRequester tempRoomEntryRequeser=new RoomEntryRequester(LinedUpActivity.this);
         DatabaseReference tempDatabaseRefernce=tempRoomEntryRequeser.find(key);
@@ -360,7 +415,7 @@ public class LinedUpActivity extends AppCompatActivity {
                 if(dataSnapshot.exists()){
                     for(DataSnapshot snapshot:dataSnapshot.getChildren()) {
                         String waiterKey = snapshot.getKey();
-                        long numChange=snapshot.child("waiterNumber").getValue(long.class);
+                        Long numChange=snapshot.child("waiterNumber").getValue(Long.class);
                         if(numChange==a.waiterNumber){
                             String str1=participant.waiterName;
                             String str2=participant.waiterPhone;
@@ -378,6 +433,8 @@ public class LinedUpActivity extends AppCompatActivity {
                 }
             }
         });
+        skip=false;
+        //getListParticipant();
     }
 
 }

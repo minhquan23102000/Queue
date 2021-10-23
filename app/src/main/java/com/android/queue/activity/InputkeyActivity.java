@@ -37,10 +37,11 @@ public class InputkeyActivity extends AppCompatActivity {
     private static MaterialTextView roomName;
     private static MaterialTextView roomTotal;
     private Button btnJoin;
+    private Button btnHome;
     private RoomEntryRequester roomEntryRequester;
     private DatabaseReference databaseReference;
     private SessionManager sessionManager;
-    private static RoomData thisRoom;
+    //private static RoomData thisRoom;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +49,7 @@ public class InputkeyActivity extends AppCompatActivity {
         scanBtn = findViewById(R.id.scanBtn);
         txtKey = findViewById(R.id.iKey);
         btnJoin = findViewById(R.id.joinBtn);
+        btnHome = findViewById(R.id.homeBtn);
         roomName = findViewById(R.id.welcomeRoom);
         roomTotal = findViewById(R.id.statusRoom);
 
@@ -70,6 +72,17 @@ public class InputkeyActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                  String key= txtKey.getEditText().getText().toString();
+                Bundle userData = sessionManager.getUserData();
+                if (userData.getString(QueueDatabaseContract.UserEntry.CURRENT_ROOM_ARM, null) != null) {
+                    if (userData.getBoolean(QueueDatabaseContract.UserEntry.IS_HOST_ARM, false)) {
+                        Intent intent = new Intent(InputkeyActivity.this, HostActivity.class);
+                        InputkeyActivity.this.startActivity(intent);
+                    }else{
+                        Intent intent = new Intent(InputkeyActivity.this,LinedUpActivity.class);
+                        intent.putExtra("keyRoom",sessionManager.getUserData().getString(QueueDatabaseContract.UserEntry.CURRENT_ROOM_ARM));
+                        startActivity(intent);
+                    }
+                }
                 //Kiểm tra key với data firebase and add Participant
                 if(key!=null){
                     roomEntryRequester = new RoomEntryRequester(InputkeyActivity.this);
@@ -108,6 +121,7 @@ public class InputkeyActivity extends AppCompatActivity {
                         }
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {
+                            Toast.makeText(InputkeyActivity.this, "Error", Toast.LENGTH_SHORT).show();
                         }
                     });
                 }else{
@@ -115,6 +129,16 @@ public class InputkeyActivity extends AppCompatActivity {
                 }
             }
         });
+
+
+        btnHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(InputkeyActivity.this,MainActivity.class);
+                startActivity(intent);
+            }
+        });
+
         scanBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -132,7 +156,7 @@ public class InputkeyActivity extends AppCompatActivity {
             query.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        thisRoom = null;
+                        //thisRoom = null;
                         if(snapshot.exists()){
                             //thisRoom=snapshot.getValue(RoomData.class);
                             //roomName.setText("Welcome "+thisRoom.roomName);
@@ -140,8 +164,8 @@ public class InputkeyActivity extends AppCompatActivity {
                             String str1 = snapshot.child("roomName").getValue(String.class);
                             Long long1 = snapshot.child("totalParticipant").getValue(Long.class);
                             Long long2 = snapshot.child("maxParticipant").getValue(Long.class);
-                            roomName.setText("Welcome "+str1);
-                            roomTotal.setText(long1.toString()+"/"+long2.toString());
+                            roomName.setText("Phòng bạn sẽ đến là: "+str1);
+                            roomTotal.setText("SS: "+long1.toString()+"/"+long2.toString());
 
                         }else{
                             roomName.setText("Phòng không tồn tại");
@@ -150,6 +174,7 @@ public class InputkeyActivity extends AppCompatActivity {
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(InputkeyActivity.this, "Error", Toast.LENGTH_SHORT).show();
                     }
                 });
             }

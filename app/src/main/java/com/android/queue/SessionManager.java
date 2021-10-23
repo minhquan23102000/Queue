@@ -38,6 +38,10 @@ public class SessionManager {
         userDataEditor.commit();
     }
 
+    public void initKeyAfterUserJoinRoom(String key){
+        userDataEditor.putString(UserEntry.CURRENT_ROOM_ARM, key);
+        userDataEditor.commit();
+    }
 
     public void putUserCurrentRoomId(String currentRoomId, boolean isHost) {
         userDataEditor.putString(UserEntry.CURRENT_ROOM_ARM, currentRoomId);
@@ -69,9 +73,17 @@ public class SessionManager {
         return bundle;
     }
 
+
+
     public void clearUserCurrentRoom() {
         userDataEditor.remove(UserEntry.CURRENT_ROOM_ARM);
         userDataEditor.putBoolean(UserEntry.IS_HOST_ARM, false);
+        userDataEditor.commit();
+    }
+
+    public void clearKeyRoomAfterLeave(){
+        userDataEditor.remove(UserEntry.CURRENT_ROOM_ARM);
+        //userDataEditor.putBoolean(UserEntry.IS_HOST_ARM, false);
         userDataEditor.commit();
     }
 
