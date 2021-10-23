@@ -23,6 +23,12 @@
         android:theme="@style/Theme.Queue"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".activity.ChangePassword"
+            android:exported="true" />
+        <activity
+            android:name=".activity.ForgotPassword"
+            android:exported="true" />
+        <activity
             android:name=".activity.LinedUpActivity"
             android:exported="true" />
         <activity

@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 
 import com.android.queue.models.Room;
 import com.android.queue.models.UserAccounts;
+import com.android.queue.utils.MD5Encode;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -41,6 +42,37 @@ public class UserAccountsRequester {
         }
         return null;
     }
+
+
+    //Cập nhật
+    public void updateUserAccount(String phone, String pass){
+        String encrypt = MD5Encode.endCode(pass);
+        Query query = mDatabase.child(QueueDatabaseContract.UserEntry.ROOT_NAME)
+                .orderByChild(QueueDatabaseContract.UserEntry.PHONE_ARM)
+                .equalTo(phone.trim());
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot user : dataSnapshot.getChildren()) {
+                        String key = user.getKey();
+                        mDatabase.child(QueueDatabaseContract.UserEntry.ROOT_NAME)
+                                .child(key).child(QueueDatabaseContract.UserEntry.PASSWORD_ARM)
+                                .setValue(encrypt);
+                        System.out.println("cập nhật thành công");
+                    }
+                } else {
+                    System.out.println("cập nhật thất bại");
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
 
     /**
      * Function to find an account, return its DatabaseReference

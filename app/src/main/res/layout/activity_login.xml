@@ -21,7 +21,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"/>
-
+    <TextView
+        android:layout_marginTop="200dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left"
+        android:layout_marginHorizontal="24dp"
+        android:text="Đăng nhập"
+        android:textColor="@color/reply_black_900"
+        android:textSize="25dp"/>
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/phoneTv"
         android:layout_width="match_parent"

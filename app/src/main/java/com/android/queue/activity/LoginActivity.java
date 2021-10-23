@@ -36,9 +36,9 @@ public class LoginActivity extends AppCompatActivity {
 
     private MaterialButton loginBtn;
     private TextView regTv;
+    private TextView forgotPassTv;
     TextInputLayout phoneTv;
     TextInputLayout passwordTv;
-
     UserAccountsRequester userAccountsRequester;
     SessionManager sessionManager;
 
@@ -52,7 +52,13 @@ public class LoginActivity extends AppCompatActivity {
         passwordTv = findViewById(R.id.passwordTv);
         loginBtn = findViewById(R.id.loginBtn);
         regTv = findViewById(R.id.regTv);
+        forgotPassTv = findViewById(R.id.forgotPassTv);
 
+        Intent intent = getIntent();
+        if (intent!=null){
+            phoneTv.getEditText().setText(intent.getStringExtra(QueueDatabaseContract.UserEntry.PHONE_ARM));
+            passwordTv.getEditText().setText(intent.getStringExtra(QueueDatabaseContract.UserEntry.PASSWORD_ARM));
+        }
 
         phoneTv.getEditText().addTextChangedListener(textWatcher);
         passwordTv.getEditText().addTextChangedListener(textWatcher);
@@ -60,10 +66,8 @@ public class LoginActivity extends AppCompatActivity {
         userAccountsRequester = new UserAccountsRequester(this);
         sessionManager = new SessionManager(this);
 
-        //test noti
-        NotificationDevice.headsUpNotification(LoginActivity.this);
-
-
+//        //test noti
+//        NotificationDevice.headsUpNotification(LoginActivity.this);
 
 
         loginBtn.setOnClickListener(new View.OnClickListener() {
@@ -76,6 +80,13 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                LoginActivity.this.startActivity(intent);
+            }
+        });
+        forgotPassTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoginActivity.this, ForgotPassword.class);
                 LoginActivity.this.startActivity(intent);
             }
         });

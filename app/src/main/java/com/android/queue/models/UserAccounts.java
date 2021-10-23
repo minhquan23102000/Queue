@@ -17,6 +17,8 @@ public class UserAccounts {
         this.phone = phone;
         this.password = password;
         this.createDate = System.currentTimeMillis() / 1000;
+        this.isLogin = false;
+        this.isHost = false;
     }
 
     public UserAccounts(String fullName, String phone, String password

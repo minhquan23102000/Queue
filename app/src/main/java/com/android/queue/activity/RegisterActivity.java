@@ -9,6 +9,7 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Toast;
 
+import com.android.queue.firebase.realtimedatabase.QueueDatabaseContract;
 import com.android.queue.firebase.realtimedatabase.UserAccountsRequester;
 import com.android.queue.models.UserAccounts;
 import com.android.queue.utils.MD5Encode;
@@ -178,10 +179,9 @@ public class RegisterActivity extends AppCompatActivity {
 
     private void sendUserToVerifyPhone(String name, String phone, String pass) {
         Intent intent = new Intent(RegisterActivity.this, VerifyPhoneNumber.class);
-        intent.putExtra("name",name);
-        intent.putExtra("phone",phone);
-
-        intent.putExtra("pass",pass);
+        intent.putExtra(QueueDatabaseContract.UserEntry.FULL_NAME_ARM,name);
+        intent.putExtra(QueueDatabaseContract.UserEntry.PHONE_ARM,phone);
+        intent.putExtra(QueueDatabaseContract.UserEntry.PASSWORD_ARM,pass);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }

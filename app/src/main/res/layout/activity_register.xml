@@ -25,10 +25,19 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="250dp"
+        android:layout_marginTop="180dp"
         android:orientation="vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginHorizontal="24dp"
+            android:text="Đăng ký tài khoản"
+            android:textColor="@color/reply_black_900"
+            android:textSize="25dp"/>
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/phoneTv"
+            android:layout_marginTop="15dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
@@ -39,12 +48,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
         </com.google.android.material.textfield.TextInputLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/nameTv"
-            android:layout_marginTop="15dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
+            android:layout_marginTop="15dp"
             android:layout_marginEnd="24dp"
             android:hint="Họ tên">
 
@@ -55,38 +65,38 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/passwordTv"
-            android:layout_marginTop="15dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/phoneTv"
             android:layout_centerHorizontal="true"
             android:layout_marginStart="24dp"
-            android:layout_below="@id/phoneTv"
+            android:layout_marginTop="15dp"
             android:layout_marginEnd="24dp"
-            app:passwordToggleEnabled="true"
-            android:hint="Mật khẩu">
+            android:hint="Mật khẩu"
+            app:passwordToggleEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
-                android:inputType="textPassword"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/re_passwordTv"
-            android:layout_marginTop="15dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_below="@id/re_passwordTv"
             android:layout_centerHorizontal="true"
             android:layout_marginStart="24dp"
-            android:layout_below="@id/re_passwordTv"
+            android:layout_marginTop="15dp"
             android:layout_marginEnd="24dp"
-            app:passwordToggleEnabled="true"
-            android:hint="Nhập lại mật khẩu">
+            android:hint="Nhập lại mật khẩu"
+            app:passwordToggleEnabled="true">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:layout_width="match_parent"
-                android:inputType="textPassword"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButton
@@ -96,8 +106,8 @@
             android:layout_below="@+id/passwordTv"
             android:layout_alignParentEnd="true"
             android:layout_gravity="center"
-            android:layout_marginTop="15dp"
             android:layout_marginStart="24dp"
+            android:layout_marginTop="15dp"
             android:layout_marginEnd="18dp"
             android:text="Đăng ký" />
     </LinearLayout>
