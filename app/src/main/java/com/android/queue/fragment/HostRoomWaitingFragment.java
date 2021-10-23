@@ -162,11 +162,10 @@ public class HostRoomWaitingFragment extends Fragment {
                             .addOnFailureListener(e -> Toast.makeText(mContext, "Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show());
                 } else {
                     Toast.makeText(mContext, "Đã hết người chờ trong phòng", Toast.LENGTH_SHORT).show();
-                    waiterNumberTv.setText("hết");
-                    waiterPhoneTv.setText("");
-                    waiterNameTv.setText("");
                 }
 
+            } else {
+                Toast.makeText(mContext, "Chưa có người xếp hàng ở vị trí này", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -189,10 +188,9 @@ public class HostRoomWaitingFragment extends Fragment {
                             .addOnFailureListener(e -> Toast.makeText(mContext, "Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show());
                 } else {
                     Toast.makeText(mContext, "Đã hết người chờ trong phòng", Toast.LENGTH_SHORT).show();
-                    waiterNumberTv.setText("hết");
-                    waiterPhoneTv.setText("");
-                    waiterNameTv.setText("");
                 }
+            } else {
+                Toast.makeText(mContext, "Chưa có người xếp hàng ở vị trí này", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -215,7 +213,10 @@ public class HostRoomWaitingFragment extends Fragment {
             thisRoom.roomData = snapshot.getValue(RoomData.class);
             //Put value into a hash map for the adapter of listview stats
             statsRoom.put(StatsRoomDataContract.TOTAL_PARTICIPANT, thisRoom.roomData.totalParticipant + "/" + thisRoom.roomData.maxParticipant);
-            statsRoom.put(StatsRoomDataContract.TOTAL_WAIT, thisRoom.roomData.totalParticipant - thisRoom.roomData.currentWait + 1 + "");
+
+            long totalwait = thisRoom.roomData.totalParticipant - thisRoom.roomData.currentWait;
+            totalwait = totalwait > 0 ? totalwait : 0;
+            statsRoom.put(StatsRoomDataContract.TOTAL_WAIT, totalwait + "");
             statsRoom.put(StatsRoomDataContract.TOTAL_DONE, thisRoom.roomData.totalDone + "");
             statsRoom.put(StatsRoomDataContract.TOTAL_SKIP, thisRoom.roomData.totalSkip + "");
             statsRoom.put(StatsRoomDataContract.TOTAL_LEFT, thisRoom.roomData.totalLeft + "");
@@ -224,6 +225,9 @@ public class HostRoomWaitingFragment extends Fragment {
             //Set current wait text view
             if (thisRoom.roomData.totalParticipant > 0) {
                 waiterNumberTv.setText(String.valueOf(thisRoom.roomData.currentWait));
+            } else if (thisRoom.roomData.currentWait > thisRoom.roomData.totalParticipant) {
+                waiterPhoneTv.setText("");
+                waiterNameTv.setText("");
             } else {
                 waiterNumberTv.setText("0");
                 Toast.makeText(mContext, "Phòng chờ hiện đang trống", Toast.LENGTH_LONG).show();
@@ -260,6 +264,9 @@ public class HostRoomWaitingFragment extends Fragment {
                 //Update current waiter into view
                 waiterNameTv.setText(thisRoom.participantList.get(0).waiterName);
                 waiterPhoneTv.setText(thisRoom.participantList.get(0).waiterPhone);
+            } else {
+                waiterNameTv.setText("");
+                waiterPhoneTv.setText("");
             }
 
             //Update next waiter
