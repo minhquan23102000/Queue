@@ -54,6 +54,7 @@ public class InputkeyActivity extends AppCompatActivity {
         roomTotal = findViewById(R.id.statusRoom);
 
 
+
         Intent intent=getIntent();
         String str = intent.getStringExtra("Key");
         txtKey.getEditText().setText(str);
@@ -146,6 +147,8 @@ public class InputkeyActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        //txtKey.getEditText().setText("-MmgBkC-A5CLw9E-Xmt8");
     }
 
 
