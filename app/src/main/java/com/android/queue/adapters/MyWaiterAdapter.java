@@ -58,9 +58,9 @@ public class MyWaiterAdapter extends ArrayAdapter<Participant> {
         if (waiterStateData.equals(ParticipantListEntry.STATE_IS_DONE)) {
             return "Xong";
         } else if (waiterStateData.equals(ParticipantListEntry.STATE_IS_LEFT)) {
-            return "Bỏ";
+            return "Thoát";
         } else if (waiterStateData.equals(ParticipantListEntry.STATE_IS_SKIP)) {
-            return "Mất";
+            return "Rời";
         } else {
             return "Chờ";
         }

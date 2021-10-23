@@ -64,7 +64,9 @@ public class WaiterListFragment extends Fragment {
         sessionManager = new SessionManager(getContext());
         roomEntryRequester = new RoomEntryRequester(getContext());
         roomReference = roomEntryRequester.find(sessionManager.getCurrentRoomKey());
-        roomReference.child(ParticipantListEntry.ROOT_NAME).addValueEventListener(listListener);
+        roomReference.child(ParticipantListEntry.ROOT_NAME)
+                .orderByChild(ParticipantListEntry.WAITER_NUMBER_ARM)
+                .addValueEventListener(listListener);
 
     }
 
@@ -144,12 +146,6 @@ public class WaiterListFragment extends Fragment {
         } else {
             filterParticipantList = filterArray("", startWaiter, participantList);
         }
-
-        for (Participant participant:
-             filterParticipantList) {
-            Log.d("WaiterList", "applyFilter: " + participant.waiterState + participant.waiterNumber);
-        }
-
 
         return filterParticipantList;
     }
