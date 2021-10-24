@@ -41,7 +41,6 @@ public class InputkeyActivity extends AppCompatActivity {
     private RoomEntryRequester roomEntryRequester;
     private DatabaseReference databaseReference;
     private SessionManager sessionManager;
-    //private static RoomData thisRoom;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,7 +83,6 @@ public class InputkeyActivity extends AppCompatActivity {
                         startActivity(intent);
                     }
                 }
-                //Kiểm tra key với data firebase and add Participant
                 if(key!=null){
                     roomEntryRequester = new RoomEntryRequester(InputkeyActivity.this);
                     databaseReference= roomEntryRequester.find(key);
@@ -94,7 +92,6 @@ public class InputkeyActivity extends AppCompatActivity {
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             if(snapshot.exists()){
                                 RoomData thisRoom = snapshot.getValue(RoomData.class);
-
                                 if (thisRoom.totalParticipant >= thisRoom.maxParticipant) {
                                     setWelcomeRoomName(key);
                                     Toast.makeText(InputkeyActivity.this, "Phòng chờ hiện tại đã bị đầy. Tổng số người trong phòng chờ là: "
@@ -147,29 +144,21 @@ public class InputkeyActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
-        //txtKey.getEditText().setText("-MmgBkC-A5CLw9E-Xmt8");
     }
 
 
     public void setWelcomeRoomName(String str){
         if(str!=null){
-
             Query query = databaseReference.child("roomData");
             query.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        //thisRoom = null;
                         if(snapshot.exists()){
-                            //thisRoom=snapshot.getValue(RoomData.class);
-                            //roomName.setText("Welcome "+thisRoom.roomName);
-                            //roomTotal.setText(thisRoom.totalParticipant.toString()+"/"+thisRoom.maxParticipant.toString());
                             String str1 = snapshot.child("roomName").getValue(String.class);
                             Long long1 = snapshot.child("totalParticipant").getValue(Long.class);
                             Long long2 = snapshot.child("maxParticipant").getValue(Long.class);
                             roomName.setText("Phòng bạn sẽ đến là: "+str1);
                             roomTotal.setText("SS: "+long1.toString()+"/"+long2.toString());
-
                         }else{
                             roomName.setText("Phòng không tồn tại");
                             roomTotal.setText("");

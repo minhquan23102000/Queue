@@ -60,7 +60,7 @@ public class LinedUpActivity extends AppCompatActivity {
     private Participant currentParticipant;
 
 
-    //private long[] numberList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,16 +97,13 @@ public class LinedUpActivity extends AppCompatActivity {
 
         roomEntryRequester = new RoomEntryRequester(LinedUpActivity.this);
         databaseReference = roomEntryRequester.find(key);
-        getListParticipant();
 
 
         leavebtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //w.cancel();
-                onBackPressed();
+                pauseTimerCountDown();
                 leaveRoom();
-                //getListParticipant();
             }
         });
 
@@ -114,15 +111,11 @@ public class LinedUpActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (currentParticipant.waiterNumber < thisRoom.roomData.totalParticipant) {
-                    //w.cancel();
                     skip = true;
                     changeNumberAfterSkip();
-                    getListParticipant();
                 } else {
                     Toast.makeText(view.getContext(), "Bạn đã ở cuối hàng", Toast.LENGTH_SHORT).show();
                 }
-                //onBackPressed();
-
             }
         });
         //Value event listener for get room data
@@ -143,11 +136,6 @@ public class LinedUpActivity extends AppCompatActivity {
                     txtHostPhone.setText(str2);
                     txtAdress.setText(str3);
                     txtTotalParticipant.setText("SS: " + thisRoom.roomData.totalParticipant + " / " + longMax);
-                    /*double pos=findPositionUser();
-                    double waitTime= snapshot.child("timeWait").getValue(double.class);
-                    double waitTimeDelay= snapshot.child("timeDelay").getValue(double.class);
-                    long time=(long)(waitTime+waitTimeDelay)*(long)(pos-1);
-                    txtTime.setText(String.valueOf(time)+" phút");*/
                 }
             }
 
@@ -166,9 +154,7 @@ public class LinedUpActivity extends AppCompatActivity {
                 if (snapshot.exists()) {
                     listParticipant.clear();
                     Bundle userData = sessionManager.getUserData();
-
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        //Participant mParticipant=dataSnapshot.getValue(Participant.class);
                         Participant mParticipant;
                         String strName = dataSnapshot.child("waiterName").getValue(String.class);
                         Long longNumber = dataSnapshot.child("waiterNumber").getValue(Long.class);
@@ -187,37 +173,9 @@ public class LinedUpActivity extends AppCompatActivity {
                     }
                     mP_Adapter.notifyDataSetChanged();
                     recyclerView.setAdapter(mP_Adapter);
-                    getDataRoomFromFirebase();
                     updateWaiterNumberAfterChange(key);
                     indexWaiter = (long) findPositionUser();
-                    if (indexWaiter != -1) {
-                        //w.cancel();
-                        //onBackPressed();
-                        if (skip != true) {
-                            //w.cancel();
-                            //onBackPressed();
-                            if (indexWaiter != indexWaiterAfterChange) {
-                                //onBackPressed();
-                                if (indexWaiterAfterChange == -100) {
-                                    isTimer = true;
-                                    timeWaitCountDown();
-                                    Log.d("TEST", "onDataChange: " + "Time on indexWaiterAfterChange == -100");
-                                } else {
-                                    onBackPressed();
-                                    // w.cancel();
-                                    isTimer = true;
-                                    timeWaitCountDown();
-                                    Log.d("TEST", "onDataChange: " + "Time on else");
-                                }
-                            }
-                        } else {
-                            onBackPressed();
-                            Log.d("TEST", "onDataChange: " + "Time stop on else skip != true");
-                        }
-                    } else {
-                        onBackPressed();
-                        Log.d("TEST", "onDataChange: " + "Time stop on else indexWaiter != -1");
-                    }
+                    resetTimeCountDown();
                 }
             }
 
@@ -230,15 +188,45 @@ public class LinedUpActivity extends AppCompatActivity {
 
     }
 
-    private void getListParticipant() {
-
-    }
-
-    private void getDataRoomFromFirebase() {
-
+    private void resetTimeCountDown(){
+        RoomEntryRequester tempRoom = new RoomEntryRequester(LinedUpActivity.this);
+        DatabaseReference tempDatabase = tempRoom.find(key);
+        Query query = tempDatabase.child("roomData");
+        query.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                thisRoom.roomData=dataSnapshot.getValue(RoomData.class);
+                if (indexWaiter != -1) {
+                    if (skip != true) {
+                        if (indexWaiter != indexWaiterAfterChange) {
+                            if (indexWaiterAfterChange == -100) {
+                                isTimer = true;
+                                timeWaitCountDown();
+                                Log.d("TEST", "onDataChange: " + "Time on indexWaiterAfterChange == -100");
+                            } else {
+                                pauseTimerCountDown();
+                                isTimer = true;
+                                timeWaitCountDown();
+                                Log.d("TEST", "onDataChange: " + "Time on else");
+                            }
+                        }
+                    } else {
+                        pauseTimerCountDown();
+                        Log.d("TEST", "onDataChange: " + "Time stop on else skip != true");
+                    }
+                } else {
+                    pauseTimerCountDown();
+                    Log.d("TEST", "onDataChange: " + "Time stop on else indexWaiter != -1");
+                }
+            }
+        });
     }
 
     private void timeWaitCountDown() {
+        if(thisRoom.roomData.timeWait==null){
+            resetTimeCountDown();
+            Log.d("TEST", "onSuccess: " + "getDataRoom");
+        }
         double waitTime = thisRoom.roomData.timeWait;
         double waitTimeDelay = thisRoom.roomData.timeDelay;
         long time = (long) (waitTime + waitTimeDelay) * (indexWaiter - 1);
@@ -246,14 +234,12 @@ public class LinedUpActivity extends AppCompatActivity {
         timeContDown(time - 1);
     }
 
-    public void onBackPressed() {
+    public void pauseTimerCountDown() {
         if (w != null) {
             w.cancel();
             w = null;
             isTimer = false;
         }
-
-        //finish();
     }
 
     private void timeContDown(long timeMinute) {
@@ -263,13 +249,11 @@ public class LinedUpActivity extends AppCompatActivity {
                     public void onTick(long mil) {
                         txtTime.setText(timeMinute + " m " + mil / 1000 + " s");
                         if (indexWaiter == -1) {
-                            //w.cancel();
-                            onBackPressed();
+                            pauseTimerCountDown();
                             Log.d("TEST", "onDataChange: " + "Time stop on timeCountDown on Ticj");
                         }
                         if (indexWaiter != indexWaiterAfterChange) {
-                            onBackPressed();
-                            //w.cancel();
+                            pauseTimerCountDown();
                             Log.d("TEST", "onDataChange: " + "Time stop on timeCountDown On Tick");
                         }
                     }
@@ -288,10 +272,14 @@ public class LinedUpActivity extends AppCompatActivity {
                     }
                 }.start();
             } else {
-                onBackPressed();
-                Log.d("TEST", "onDataChange: " + "Time stop on timeCountDown On asdasd");
-                //w.cancel();
-                Toast.makeText(LinedUpActivity.this, "Chờ gì lâu thế :v", Toast.LENGTH_SHORT).show();
+                pauseTimerCountDown();
+                if(indexWaiter==1){
+                    Log.d("TEST", "onDataChange: " + "Time stop on timeCountDown");
+                    Toast.makeText(LinedUpActivity.this, "Tới lượt bạn rồi", Toast.LENGTH_SHORT).show();
+                }else {
+                    Log.d("TEST", "onDataChange: " + "Time stop on timeCountDown");
+                    Toast.makeText(LinedUpActivity.this, "Chờ gì lâu thế :v", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }
@@ -325,8 +313,7 @@ public class LinedUpActivity extends AppCompatActivity {
                             updateAfterLeave(waiterKey);
                             tempRoom.updateTotalParticipantafterChange(key);
                             sessionManager.clearKeyRoomAfterLeave();
-                            //w.cancel();
-                            onBackPressed();
+                            pauseTimerCountDown();
                             indexWaiter = indexWaiterAfterChange = -100;
                             Intent intent = new Intent(LinedUpActivity.this, MainActivity.class);
                             startActivity(intent);
@@ -371,10 +358,7 @@ public class LinedUpActivity extends AppCompatActivity {
 
     //Hàm thay đổi data sau khi tài khoản bỏ lượt
     private void changeNumberAfterSkip() {
-        Log.d("TEST", "onDataChange: " + "Time stop on timeCountDown On asdasd");
-        //onBackPressed();
         skip = true;
-        //w.cancel();
         String waiterPhone = sessionManager.getUserData().getString(QueueDatabaseContract.UserEntry.PHONE_ARM);
         RoomEntryRequester tempRoomEntryRequeser = new RoomEntryRequester(LinedUpActivity.this);
         DatabaseReference tempDatabaseRefernce = tempRoomEntryRequeser.find(key);
@@ -384,7 +368,6 @@ public class LinedUpActivity extends AppCompatActivity {
             public void onSuccess(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        //String waiterkey=snapshot.getKey();
                         String str = snapshot.child("waiterPhone").getValue(String.class);
                         if (str.equals(waiterPhone)) {
                             Long index = snapshot.child("waiterNumber").getValue(Long.class);
@@ -393,7 +376,6 @@ public class LinedUpActivity extends AppCompatActivity {
                                 String strPhone = snapshot.child("waiterPhone").getValue(String.class);
                                 String strState = snapshot.child("waiterState").getValue(String.class);
                                 Participant waiterChange = new Participant(strPhone, strName, index, strState);
-                                //getDataWaiter(index + 1);
                                 changeWaiter(waiterChange);
                             } else {
                                 Toast.makeText(LinedUpActivity.this, "Bạn đã cuối hàng đợi", Toast.LENGTH_SHORT).show();
@@ -405,7 +387,7 @@ public class LinedUpActivity extends AppCompatActivity {
         });
     }
 
-    private Participant participant;
+    /*private Participant participant;
 
     public void getDataWaiter(Long index) {
         RoomEntryRequester tempRoomEntryRequeser = new RoomEntryRequester(LinedUpActivity.this);
@@ -428,14 +410,10 @@ public class LinedUpActivity extends AppCompatActivity {
             }
         });
         //return participant;
-    }
+    }*/
 
     private void changeWaiter(Participant a) {
-        Log.d("TEST", "onDataChange: " + "Time stop  On changeWaiter");
-        onBackPressed();
-
-        //w.cancel();
-        //String waiterPhone=sessionManager.getUserData().getString(QueueDatabaseContract.UserEntry.PHONE_ARM);
+        pauseTimerCountDown();
         RoomEntryRequester tempRoomEntryRequeser = new RoomEntryRequester(LinedUpActivity.this);
         DatabaseReference tempDatabaseRefernce = tempRoomEntryRequeser.find(key);
         Query query = tempDatabaseRefernce.child("participantList");
@@ -465,7 +443,15 @@ public class LinedUpActivity extends AppCompatActivity {
             }
         });
         skip = false;
-        //getListParticipant();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(indexWaiter==-1)
+            leaveRoom();
+        Log.d("Activity ", "onResume");
+        Toast.makeText(this, "Activity : onResume", Toast.LENGTH_SHORT).show();
     }
 
 }
