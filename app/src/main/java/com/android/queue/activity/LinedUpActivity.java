@@ -111,7 +111,7 @@ public class LinedUpActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (currentParticipant.waiterNumber < thisRoom.roomData.totalParticipant) {
-                    skip = true;
+                    Log.d("Activity ", "skip true first");
                     changeNumberAfterSkip();
                 } else {
                     Toast.makeText(view.getContext(), "Bạn đã ở cuối hàng", Toast.LENGTH_SHORT).show();
@@ -131,7 +131,6 @@ public class LinedUpActivity extends AppCompatActivity {
                     String str2 = thisRoom.roomData.hostPhone;
                     String str3 = thisRoom.roomData.address;
                     Long longMax = thisRoom.roomData.maxParticipant;
-                    //int count = mP_Adapter.getIsWaiterCount();
                     txtRoomName.setText("Tên phòng: " + str1);
                     txtHostPhone.setText(str2);
                     txtAdress.setText(str3);
@@ -161,11 +160,15 @@ public class LinedUpActivity extends AppCompatActivity {
                         String strPhone = dataSnapshot.child("waiterPhone").getValue(String.class);
                         String strState = dataSnapshot.child("waiterState").getValue(String.class);
                         if (longNumber != -1) {
-                            mParticipant = new Participant(strPhone, strName, longNumber, strState);
-                            listParticipant.add(mParticipant);
-                            if (strPhone.equals(userData.getString(QueueDatabaseContract.UserEntry.PHONE_ARM))) {
-                                Log.d("TEST", "onDataChange: " + "Tim thay " + userData.getString(QueueDatabaseContract.UserEntry.PHONE_ARM));
-                                currentParticipant = mParticipant;
+                            if(!strState.equals("IsDone")){
+                                if(!strState.equals("IsSkip")){
+                                    mParticipant = new Participant(strPhone, strName, longNumber, strState);
+                                    listParticipant.add(mParticipant);
+                                    if (strPhone.equals(userData.getString(QueueDatabaseContract.UserEntry.PHONE_ARM))) {
+                                        Log.d("TEST", "onDataChange: " + "Tìm thấy " + userData.getString(QueueDatabaseContract.UserEntry.PHONE_ARM));
+                                        currentParticipant = mParticipant;
+                                    }
+                                }
                             }
                         }
 
@@ -173,8 +176,18 @@ public class LinedUpActivity extends AppCompatActivity {
                     }
                     mP_Adapter.notifyDataSetChanged();
                     recyclerView.setAdapter(mP_Adapter);
-                    updateWaiterNumberAfterChange(key);
+                    //updateWaiterNumberAfterChange(key);
                     indexWaiter = (long) findPositionUser();
+                    if(skip!=true){
+                        Log.d("Activity ", "skip false");
+                        if(indexWaiter==-1){
+                            Log.d("Activity ", "out room");
+                            sessionManager.clearKeyRoomAfterLeave();
+                            pauseTimerCountDown();
+                            Intent intent = new Intent(LinedUpActivity.this, MainActivity.class);
+                            startActivity(intent);
+                        }
+                    }
                     resetTimeCountDown();
                 }
             }
@@ -220,6 +233,7 @@ public class LinedUpActivity extends AppCompatActivity {
                 }
             }
         });
+
     }
 
     private void timeWaitCountDown() {
@@ -369,50 +383,29 @@ public class LinedUpActivity extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         String str = snapshot.child("waiterPhone").getValue(String.class);
-                        if (str.equals(waiterPhone)) {
+                        //if (str.equals(waiterPhone))
+                         {
+                            String waiterKey = snapshot.getKey();
                             Long index = snapshot.child("waiterNumber").getValue(Long.class);
-                            if (index != mP_Adapter.getItemCount()) {
-                                String strName = snapshot.child("waiterName").getValue(String.class);
-                                String strPhone = snapshot.child("waiterPhone").getValue(String.class);
-                                String strState = snapshot.child("waiterState").getValue(String.class);
-                                Participant waiterChange = new Participant(strPhone, strName, index, strState);
-                                changeWaiter(waiterChange);
-                            } else {
-                                Toast.makeText(LinedUpActivity.this, "Bạn đã cuối hàng đợi", Toast.LENGTH_SHORT).show();
+                            if (index == currentParticipant.waiterNumber+1) {
+                                Participant p = listParticipant.get((int)indexWaiter-1);
+                                Participant a = listParticipant.get((int)indexWaiter);
+                                tempDatabaseRefernce.child("participantList").child(waiterKey).child("waiterName").setValue(p.waiterName);
+                                tempDatabaseRefernce.child("participantList").child(waiterKey).child("waiterPhone").setValue(p.waiterPhone);
+                                tempDatabaseRefernce.child("participantList").child(waiterKey).child("waiterState").setValue(p.waiterState);
+                                changeWaiter(a);
                             }
-                        }
+                            }
                     }
                 }
             }
         });
     }
 
-    /*private Participant participant;
-
-    public void getDataWaiter(Long index) {
-        RoomEntryRequester tempRoomEntryRequeser = new RoomEntryRequester(LinedUpActivity.this);
-        DatabaseReference tempDatabaseRefernce = tempRoomEntryRequeser.find(key);
-        Query query = tempDatabaseRefernce.child("participantList");
-        query.get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
-            @Override
-            public void onSuccess(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        Long find = snapshot.child("waiterNumber").getValue(Long.class);
-                        if (index == find) {
-                            String strName = snapshot.child("waiterName").getValue(String.class);
-                            String strPhone = snapshot.child("waiterPhone").getValue(String.class);
-                            String strState = snapshot.child("waiterState").getValue(String.class);
-                            participant = new Participant(strPhone, strName, find, strState);
-                        }
-                    }
-                }
-            }
-        });
-        //return participant;
-    }*/
 
     private void changeWaiter(Participant a) {
+        skip = true;
+        Log.d("Activity ", "skip true");
         pauseTimerCountDown();
         RoomEntryRequester tempRoomEntryRequeser = new RoomEntryRequester(LinedUpActivity.this);
         DatabaseReference tempDatabaseRefernce = tempRoomEntryRequeser.find(key);
@@ -424,16 +417,7 @@ public class LinedUpActivity extends AppCompatActivity {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         String waiterKey = snapshot.getKey();
                         Long numChange = snapshot.child("waiterNumber").getValue(Long.class);
-                        if (numChange == a.waiterNumber) {
-                            Participant p = listParticipant.get(currentParticipant.waiterNumber.intValue());
-                            String str1 = p.waiterName;
-                            String str2 = p.waiterPhone;
-                            String str3 = p.waiterState;
-                            tempDatabaseRefernce.child("participantList").child(waiterKey).child("waiterName").setValue(str1);
-                            tempDatabaseRefernce.child("participantList").child(waiterKey).child("waiterPhone").setValue(str2);
-                            tempDatabaseRefernce.child("participantList").child(waiterKey).child("waiterState").setValue(str3);
-                        }
-                        if (numChange == currentParticipant.waiterNumber + 1) {
+                        if (numChange == a.waiterNumber-1) {
                             tempDatabaseRefernce.child("participantList").child(waiterKey).child("waiterName").setValue(a.waiterName);
                             tempDatabaseRefernce.child("participantList").child(waiterKey).child("waiterPhone").setValue(a.waiterPhone);
                             tempDatabaseRefernce.child("participantList").child(waiterKey).child("waiterState").setValue(a.waiterState);
@@ -448,10 +432,6 @@ public class LinedUpActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if(indexWaiter==-1)
-            leaveRoom();
         Log.d("Activity ", "onResume");
-        Toast.makeText(this, "Activity : onResume", Toast.LENGTH_SHORT).show();
     }
-
 }

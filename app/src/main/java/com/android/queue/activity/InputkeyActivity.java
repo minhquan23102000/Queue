@@ -71,19 +71,19 @@ public class InputkeyActivity extends AppCompatActivity {
         btnJoin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                 String key= txtKey.getEditText().getText().toString();
+                String key= txtKey.getEditText().getText().toString();
                 Bundle userData = sessionManager.getUserData();
                 if (userData.getString(QueueDatabaseContract.UserEntry.CURRENT_ROOM_ARM, null) != null) {
-                    if (userData.getBoolean(QueueDatabaseContract.UserEntry.IS_HOST_ARM, false)) {
+                    /*if (userData.getBoolean(QueueDatabaseContract.UserEntry.IS_HOST_ARM, false)) {
                         Intent intent = new Intent(InputkeyActivity.this, HostActivity.class);
                         InputkeyActivity.this.startActivity(intent);
-                    }else{
-                        Intent intent = new Intent(InputkeyActivity.this,LinedUpActivity.class);
-                        intent.putExtra("keyRoom",sessionManager.getUserData().getString(QueueDatabaseContract.UserEntry.CURRENT_ROOM_ARM));
-                        startActivity(intent);
-                    }
+                    }else{*/
+                    Intent intent = new Intent(InputkeyActivity.this, LinedUpActivity.class);
+                    intent.putExtra("keyRoom", sessionManager.getUserData().getString(QueueDatabaseContract.UserEntry.CURRENT_ROOM_ARM));
+                    startActivity(intent);
+                    //}
                 }
-                if(key!=null){
+                if(key.length()!=0){
                     roomEntryRequester = new RoomEntryRequester(InputkeyActivity.this);
                     databaseReference= roomEntryRequester.find(key);
                     Query query = databaseReference.child("roomData");

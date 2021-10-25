@@ -49,14 +49,14 @@ public class ParticipantAdapter extends RecyclerView.Adapter<ParticipantAdapter.
             return;
         }
         if(participant.waiterNumber!=-1){
-            if(participant.waiterNumber==1){
+            if(position==0){
                 holder.tv_Name.setText(participant.getWaiterName());
-                holder.sTT.setText("STT:"+participant.getWaiterNumber());
+                holder.sTT.setText("STT:"+(position+1));
                 holder.state.setText("Đang xử lý");
             }else{
                 holder.tv_Name.setText(participant.getWaiterName());
-                holder.sTT.setText("STT:"+participant.getWaiterNumber());
-                holder.state.setText("Dang chờ  ");
+                holder.sTT.setText("STT:"+(position+1));
+                holder.state.setText("Đang chờ  ");
             }
             if(participant.waiterPhone.equals(waiterPhone)){
                 holder.linearLayout.setBackgroundColor(Color.parseColor("#2A9D8F"));

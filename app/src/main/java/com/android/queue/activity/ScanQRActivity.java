@@ -37,7 +37,8 @@ public class ScanQRActivity extends AppCompatActivity {
         mCodeScanner = new CodeScanner(this,scannerView);
 
         askPermission();
-        if (CameraPermission) {
+        if (CameraPermission)
+        {
             scannerView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -52,7 +53,6 @@ public class ScanQRActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             Toast.makeText(ScanQRActivity.this, result.getText(), Toast.LENGTH_LONG).show();
-
                             Intent intent=new Intent(ScanQRActivity.this,InputkeyActivity.class);
                             intent.putExtra("Key",result.getText().toString());
                             startActivity(intent);
@@ -77,61 +77,10 @@ public class ScanQRActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull @NotNull String[] permissions, @NonNull @NotNull int[] grantResults) {
-        if (requestCode == CAMERA_PERM){
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                mCodeScanner.startPreview();
-                CameraPermission = true;
-            }else {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.CAMERA)){
-                    new AlertDialog.Builder(this)
-                            .setTitle("Permission")
-                            .setMessage("Please provide the camera permission for using all the features of the app")
-                            .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    ActivityCompat.requestPermissions(ScanQRActivity.this,new String[]{Manifest.permission.CAMERA},CAMERA_PERM);
-                                }
-                            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    }).create().show();
-                }else {
-                    new AlertDialog.Builder(this)
-                            .setTitle("Permission")
-                            .setMessage("You have denied some permission. Allow all permission at [Settings] > [Permissions]")
-                            .setPositiveButton("Settings", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-
-                                    dialog.dismiss();
-                                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                                            Uri.fromParts("package",getPackageName(),null));
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    startActivity(intent);
-                                    finish();
-                                }
-                            }).setNegativeButton("No, Exit app", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            finish();
-                        }
-                    }).create().show();
-                }
-            }
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-    @Override
     protected void onPause() {
         if (CameraPermission){
             mCodeScanner.releaseResources();
         }
-
         super.onPause();
     }
 }
