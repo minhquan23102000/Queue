@@ -131,7 +131,7 @@ public class WaiterListFragment extends Fragment {
 
     private ArrayList<Participant> applyFilter(ArrayList<Participant> participantList) {
         ArrayList<Participant> filterParticipantList;
-        long startWaiter = showAll.isChecked() ? 0 : currentWait;
+        long startWaiter = showAll.isChecked() ? -10 : currentWait;
         String filterData = filter.getText().toString().trim();
 
 
